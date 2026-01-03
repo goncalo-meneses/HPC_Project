@@ -1,0 +1,76 @@
+=== N=200, p=1 ===
+srun: Warning: can't run 1 processes on 2 nodes, setting nnodes to 1
+N=200, p=1, time=0.027846 seconds
+
+=== N=200, p=2 ===
+N=200, p=2, time=0.014088 seconds
+
+=== N=200, p=8 ===
+N=200, p=8, time=0.020040 seconds
+
+=== N=200, p=24 ===
+N=200, p=24, time=0.002951 seconds
+
+=== N=200, p=48 ===
+N=200, p=48, time=0.014464 seconds
+
+=== N=200, p=64 ===
+N=200, p=64, time=0.006605 seconds
+
+=== N=400, p=1 ===
+srun: Warning: can't run 1 processes on 2 nodes, setting nnodes to 1
+N=400, p=1, time=0.265084 seconds
+
+=== N=400, p=2 ===
+N=400, p=2, time=0.131978 seconds
+
+=== N=400, p=8 ===
+N=400, p=8, time=0.050858 seconds
+
+=== N=400, p=24 ===
+N=400, p=24, time=0.013021 seconds
+
+=== N=400, p=48 ===
+N=400, p=48, time=0.029386 seconds
+
+=== N=400, p=64 ===
+N=400, p=64, time=0.007165 seconds
+
+=== N=800, p=1 ===
+srun: Warning: can't run 1 processes on 2 nodes, setting nnodes to 1
+N=800, p=1, time=1.991098 seconds
+
+=== N=800, p=2 ===
+N=800, p=2, time=1.045047 seconds
+
+=== N=800, p=8 ===
+N=800, p=8, time=0.366784 seconds
+
+=== N=800, p=24 ===
+N=800, p=24, time=0.136996 seconds
+
+=== N=800, p=48 ===
+N=800, p=48, time=0.086643 seconds
+
+=== N=800, p=64 ===
+N=800, p=64, time=0.051560 seconds
+
+=== N=1000, p=1 ===
+srun: Warning: can't run 1 processes on 2 nodes, setting nnodes to 1
+N=1000, p=1, time=3.642680 seconds
+
+=== N=1000, p=2 ===
+N=1000, p=2, time=1.907233 seconds
+
+=== N=1000, p=8 ===
+N=1000, p=8, time=0.654886 seconds
+
+=== N=1000, p=24 ===
+N=1000, p=24, time=0.255771 seconds
+
+=== N=1000, p=48 ===
+N=1000, p=48, time=0.184621 seconds
+
+=== N=1000, p=64 ===
+N=1000, p=64, time=0.093303 seconds
+

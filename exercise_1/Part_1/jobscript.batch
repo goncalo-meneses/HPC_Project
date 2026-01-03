@@ -1,0 +1,12 @@
+#!/bin/sh
+#SBATCH --job-name=poisson_solver
+#SBATCH --partition=compute-p1
+#SBATCH --account=Education-EEMCS-Courses-WI4049TU
+#SBATCH --time=00:00:60
+#SBATCH --ntasks=4
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=1GB
+module load 2025
+module load openmpi
+module load slurm
+srun MPI_Poisson 2 2 > output.log
