@@ -280,7 +280,12 @@ void Solve(int argc, char **argv)
     double global_delta;
 	double delta1, delta2;
 	int border_factor = 1;
+
 	double start_time, curr_time;
+	double time_exchange_start_1, time_exchange_stop_1;
+	double time_exchange_start_2, time_exchange_stop_2;
+	double total_time_exchange;
+	double time_exchange;
 	
 	int k;
 
@@ -311,17 +316,28 @@ void Solve(int argc, char **argv)
 	{
 		Debug("Do_Step 0", 0);
 		if (count % border_factor == 0)
+			time_exchange_start_1 = MPI_Wtime()
 			Exchange_Borders();
+			time_exchange_stop_1 = MPI_Wtime()
 		delta1 = Do_Step(0);
 
 		Debug("Do_Step 1", 0);
 		if (count % border_factor == 0)
+			time_exchange_start_2 = MPI_Wtime()
 			Exchange_Borders();
+			time_exchange_stop_2 = MPI_Wtime()
 		delta2 = Do_Step(1);
+
+		if (count % border_factor == 0)
+		{
+			time_exchange = time_exchange_stop_1 - time_exchange_start_1 + time_exchange_stop_2 - time_exchange_start_2;
+			total_time_exchange += time_exchange;
+		}
 
 		delta = max(delta1, delta2);
         MPI_Allreduce(&delta, &global_delta, 1, MPI_DOUBLE, MPI_MAX, grid_comm);
 		count++;
+
 
 		if (ERROR && proc_rank == 0)
 		{
