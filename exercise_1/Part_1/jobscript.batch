@@ -2,7 +2,7 @@
 #SBATCH --job-name=poisson_solver
 #SBATCH --partition=compute-p1
 #SBATCH --account=Education-EEMCS-Courses-WI4049TU
-#SBATCH --time=00:00:60
+#SBATCH --time=00:03:00
 #SBATCH --ntasks=4
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=1GB
