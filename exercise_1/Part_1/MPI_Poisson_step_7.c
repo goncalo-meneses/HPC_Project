@@ -194,6 +194,9 @@ void Setup_Grid()
 			
             x = x - offset[X_DIR];
             y = y - offset[Y_DIR];
+
+			printf("(%i) x, y = (%d, %d), dim[X_DIR] = %d, dim[Y_DIR] = %d\n", proc_rank, x, y, dim[X_DIR], dim[Y_DIR]); // Debug 3x1 process grid
+
             if (x > 0 && x < dim[X_DIR] - 1 && y > 0 && y < dim[Y_DIR] - 1)
             {
                 phi[x][y] = source_val;
