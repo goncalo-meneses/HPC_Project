@@ -48,33 +48,33 @@ void print_timer();
 
 void start_timer()
 {
-    if (!timer_on)
-    {
+	if (!timer_on)
+	{
         MPI_Barrier(MPI_COMM_WORLD);
-        ticks = clock();
+		ticks = clock();
         wtime = MPI_Wtime();
-        timer_on = 1;
-    }
+		timer_on = 1;
+	}
 }
 
 void resume_timer()
 {
-    if (!timer_on)
-    {
-        ticks = clock() - ticks;
+	if (!timer_on)
+	{
+		ticks = clock() - ticks;
         wtime = MPI_Wtime() - wtime;
-        timer_on = 1;
-    }
+		timer_on = 1;
+	}
 }
 
 void stop_timer()
 {
-    if (timer_on)
-    {
-        ticks = clock() - ticks;
+	if (timer_on)
+	{
+		ticks = clock() - ticks;
         wtime = MPI_Wtime() - wtime;
-        timer_on = 0;
-    }
+		timer_on = 0;
+	}
 }
 
 void print_timer()
@@ -92,7 +92,6 @@ void print_timer()
                proc_rank, wtime,
                100.0 * ticks * (1.0 / CLOCKS_PER_SEC) / wtime);
 }
-
 
 void Debug(char *mesg, int terminate)
 {
@@ -156,18 +155,16 @@ void Setup_Grid()
 	/* put sources in field */
 	do
 	{
-        if (proc_rank == 0){
+        if (proc_rank == 0)
 		    s = fscanf(f, "source: %lf %lf %lf\n", &source_x, &source_y, &source_val);
-        }
 
         MPI_Bcast(&s, 1, MPI_INT, 0, MPI_COMM_WORLD);
-
+        
 		if (s == 3)
 		{
             MPI_Bcast(&source_x, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
             MPI_Bcast(&source_y, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
             MPI_Bcast(&source_val, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
 			x = source_x * gridsize[X_DIR];
 			y = source_y * gridsize[Y_DIR];
 			x += 1;
@@ -178,7 +175,8 @@ void Setup_Grid()
 	}
 	while (s == 3);
 
-	if (proc_rank==0) fclose(f);
+    if (proc_rank == 0)
+	    fclose(f);
 }
 
 double Do_Step(int parity)
@@ -233,11 +231,11 @@ void Write_Grid()
 	int x, y;
 	FILE *f;
 
-	char filename[40];
+    char filename[40];
     sprintf(filename, "output%i.dat", proc_rank);
 
-    if ((f=fopen(filename, "w")==NULL))
-        Debug("Write_Grid fopen failed", 1);
+	if ((f = fopen(filename, "w")) == NULL)
+		Debug("Write_Grid : fopen failed", 1);
 
 	Debug("Write_Grid", 0);
 
@@ -260,22 +258,24 @@ void Clean_Up()
 
 int main(int argc, char **argv)
 {
-    int size;
-    MPI_Init(&argc, &argv);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
-    MPI_Comm_rank(MPI_COMM_WORLD, &proc_rank);
+	int size;
 
-    printf("Hello from rank %d out of %d\n", rank, size);
+	MPI_Init(&argc, &argv);
+	MPI_Comm_rank(MPI_COMM_WORLD, &proc_rank);
+	MPI_Comm_size(MPI_COMM_WORLD, &size);
 
 	start_timer();
 
 	Setup_Grid();
+
 	Solve();
+
 	Write_Grid();
 
 	print_timer();
-	Clean_Up();
 
-    MPI_Finalize();
+	Clean_Up();
+	MPI_Finalize();
+
 	return 0;
 }

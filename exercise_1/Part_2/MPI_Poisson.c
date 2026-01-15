@@ -48,6 +48,8 @@ double wtime;
 int offset[2];
 MPI_Datatype border_type[2];
 
+double w = 1.95; // SOR relaxation parameter
+
 void Setup_Grid();
 double Do_Step(int parity);
 void Solve();
@@ -250,7 +252,6 @@ double Do_Step(int parity)
 	int y_start;
 	double old_phi;
 	double max_err = 0.0;
-	double w = 1.95;
 
 	/* calculate interior of grid */
 	for (x = 1; x < dim[X_DIR] - 1; x++)

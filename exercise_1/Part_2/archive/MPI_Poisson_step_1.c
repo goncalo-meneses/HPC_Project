@@ -1,5 +1,5 @@
 /*
- * SEQ_Poisson.c
+ * MPI_Poisson.c
  * 2D Poisson equation solver
  */
 
@@ -41,9 +41,10 @@ int P_grid[2];
 MPI_Comm grid_comm;
 MPI_Status status;
 
-double wtime;
+double wtime = ...;
 
 int offset[2];
+MPI_Datatype border_type[2];
 
 void Setup_Grid();
 double Do_Step(int parity);
@@ -194,9 +195,6 @@ void Setup_Grid()
 			
             x = x - offset[X_DIR];
             y = y - offset[Y_DIR];
-
-			printf("(%i) x, y = (%d, %d), dim[X_DIR] = %d, dim[Y_DIR] = %d\n", proc_rank, x, y, dim[X_DIR], dim[Y_DIR]); // Debug 3x1 process grid
-
             if (x > 0 && x < dim[X_DIR] - 1 && y > 0 && y < dim[Y_DIR] - 1)
             {
                 phi[x][y] = source_val;
@@ -210,6 +208,40 @@ void Setup_Grid()
 	    fclose(f);
 }
 
+void Setup_MPI_Datatypes()
+{
+    Debug("Setup_MPI_Datatypes", 0);
+    
+    // Datatype for vertical data exchange (Y_DIR)
+    MPI_Type_vector(dim[X_DIR] - 2, 1, dim[Y_DIR], MPI_DOUBLE, &border_type[Y_DIR]);
+    MPI_Type_commit(&border_type[Y_DIR]);
+    
+    // Datatype for horizontal data exchange (X_DIR)
+    MPI_Type_vector(dim[Y_DIR] - 2, 1, 1, MPI_DOUBLE, &border_type[X_DIR]);
+    MPI_Type_commit(&border_type[X_DIR]);
+}
+
+void Exchange_Borders()
+{
+    Debug("Exchange_Borders", 0);
+
+    MPI_Sendrecv(&phi[1][1], 1, border_type[Y_DIR], proc_top, 0, 
+                 &phi[1][dim[Y_DIR] - 1], 1, border_type[Y_DIR], proc_bottom, 0, 
+                 grid_comm, &status); // all traffic in the "top" direction
+
+    MPI_Sendrecv(&phi[1][dim[Y_DIR] - 2], 1, border_type[Y_DIR], proc_bottom, 0, 
+                 &phi[1][0], 1, border_type[Y_DIR], proc_top, 0, 
+                 grid_comm, &status); // all traffic in the "bottom" direction
+    
+    MPI_Sendrecv(&phi[1][1], 1, border_type[X_DIR], proc_left, 0, 
+                 &phi[dim[X_DIR] - 1][1], 1, border_type[X_DIR], proc_right, 0, 
+                 grid_comm, &status); // all traffic in the "left" direction
+    
+    MPI_Sendrecv(&phi[dim[X_DIR] - 2][1], 1, border_type[X_DIR], proc_right, 0, 
+                 &phi[0][1], 1, border_type[X_DIR], proc_left, 0, 
+                 grid_comm, &status); // all traffic in the "right" direction
+}
+
 double Do_Step(int parity)
 {
 	int x, y;
@@ -219,11 +251,12 @@ double Do_Step(int parity)
 	/* calculate interior of grid */
 	for (x = 1; x < dim[X_DIR] - 1; x++)
 		for (y = 1; y < dim[Y_DIR] - 1; y++)
-			if ((x + y) % 2 == parity && source[x][y] != 1)
+			if ((x + offset[X_DIR] + y + offset[Y_DIR]) % 2 == parity && source[x][y] != 1)
 			{
 				old_phi = phi[x][y];
-				phi[x][y] = (phi[x + 1][y] + phi[x - 1][y] +
-				             phi[x][y + 1] + phi[x][y - 1]) * 0.25;
+				phi[x][y] = w * (phi[x + 1][y] + phi[x - 1][y] +
+				             phi[x][y + 1] + phi[x][y - 1]) * 0.25 +
+							 (1 - w) * phi[x][y];
 				if (max_err < fabs(old_phi - phi[x][y]))
 					max_err = fabs(old_phi - phi[x][y]);
 			}
@@ -235,22 +268,26 @@ void Solve()
 {
 	int count = 0;
 	double delta;
+    double global_delta;
 	double delta1, delta2;
 
 	Debug("Solve", 0);
 
 	/* give global_delta a higher value then precision_goal */
-	delta = 2 * precision_goal;
+	global_delta = 2 * precision_goal;
 
-	while (delta > precision_goal && count < max_iter)
+	while (global_delta > precision_goal && count < max_iter)
 	{
 		Debug("Do_Step 0", 0);
+		Exchange_Borders();
 		delta1 = Do_Step(0);
 
 		Debug("Do_Step 1", 0);
+		Exchange_Borders();
 		delta2 = Do_Step(1);
 
 		delta = max(delta1, delta2);
+        MPI_Allreduce(&delta, &global_delta, 1, MPI_DOUBLE, MPI_MAX, grid_comm);
 		count++;
 	}
 
@@ -272,7 +309,7 @@ void Write_Grid()
 
 	for (x = 1; x < dim[X_DIR] - 1; x++)
 		for (y = 1; y < dim[Y_DIR] - 1; y++)
-			fprintf(f, "%i %i %f\n", x, y, phi[x][y]);
+			fprintf(f, "%i %i %f\n", x + offset[X_DIR], y + offset[Y_DIR], phi[x][y]);
 
 	fclose(f);
 }
@@ -280,6 +317,9 @@ void Write_Grid()
 void Clean_Up()
 {
 	Debug("Clean_Up", 0);
+
+    // MPI_Type_free(&border_type[X_DIR]);
+    // MPI_Type_free(&border_type[Y_DIR]);
 
 	free(phi[0]);
 	free(phi);
@@ -334,6 +374,7 @@ int main(int argc, char **argv)
 	start_timer();
 
 	Setup_Grid();
+	Setup_MPI_Datatypes();
 
 	Solve();
 
@@ -343,7 +384,7 @@ int main(int argc, char **argv)
 
 	Clean_Up();
 
-	MPI_Finalize();
+    MPI_Finalize();
 
 	return 0;
 }
