@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #SBATCH --job-name=poisson_solver
 #SBATCH --partition=compute-p1
 #SBATCH --account=Education-EEMCS-Courses-WI4049TU
@@ -9,6 +9,26 @@
 module load 2025
 module load openmpi
 module load slurm
-# srun MPI_Poisson_opt 2 2 5 > output_opt_5_sweeps.log
-# srun MPI_Poisson_not_opt 2 2 5 > output_not_opt_5_sweeps.log
-srun MPI_Poisson 2 2 1 > output.log
+
+read grid_x grid_y iterations < <(python3 << EOF
+with open('input.dat', 'r') as f:
+    params = {}
+    for line in f:
+        if ':' in line and not line.strip().startswith('source'):
+            key, val = line.split(':', 1)
+            params[key.strip()] = val.strip()
+
+grid_x = params['nx']
+grid_y = params['ny']
+iterations = params['max iterations']
+print(grid_x, grid_y, iterations)
+EOF
+)
+
+echo "Parameters: grid=${grid_x}x${grid_y}, iterations=${iterations}"
+
+for topo in "2 2" "4 1"
+do
+    topo_file=$(echo $topo | tr ' ' 'x')
+    srun MPI_Poisson $topo 1.95 > ./step_3/output_t${topo_file}_g${grid_x}x${grid_y}_i${iterations}.log
+done

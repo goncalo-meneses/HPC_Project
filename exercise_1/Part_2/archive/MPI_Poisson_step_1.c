@@ -41,13 +41,13 @@ int P_grid[2];
 MPI_Comm grid_comm;
 MPI_Status status;
 
-double wtime = ...;
+double wtime;
 
 int offset[2];
 MPI_Datatype border_type[2];
 
 void Setup_Grid();
-double Do_Step(int parity);
+double Do_Step(int parity, double w);
 void Solve();
 void Write_Grid();
 void Clean_Up();
@@ -242,7 +242,7 @@ void Exchange_Borders()
                  grid_comm, &status); // all traffic in the "right" direction
 }
 
-double Do_Step(int parity)
+double Do_Step(int parity, double w)
 {
 	int x, y;
 	double old_phi;
@@ -264,12 +264,19 @@ double Do_Step(int parity)
 	return max_err;
 }
 
-void Solve()
+void Solve(int argc, char **argv)
 {
 	int count = 0;
 	double delta;
     double global_delta;
 	double delta1, delta2;
+
+	double w = 1.0; 		/* SOR relaxation parameter */
+
+	if (argc > 3)
+	{
+		w = atof(argv[3]);
+	}
 
 	Debug("Solve", 0);
 
@@ -280,11 +287,11 @@ void Solve()
 	{
 		Debug("Do_Step 0", 0);
 		Exchange_Borders();
-		delta1 = Do_Step(0);
+		delta1 = Do_Step(0, w);
 
 		Debug("Do_Step 1", 0);
 		Exchange_Borders();
-		delta2 = Do_Step(1);
+		delta2 = Do_Step(1, w);
 
 		delta = max(delta1, delta2);
         MPI_Allreduce(&delta, &global_delta, 1, MPI_DOUBLE, MPI_MAX, grid_comm);
@@ -376,7 +383,7 @@ int main(int argc, char **argv)
 	Setup_Grid();
 	Setup_MPI_Datatypes();
 
-	Solve();
+	Solve(argc, argv);
 
 	Write_Grid();
 
