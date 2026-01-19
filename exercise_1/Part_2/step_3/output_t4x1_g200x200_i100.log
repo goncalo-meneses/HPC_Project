@@ -1,12 +1,12 @@
-(1) (x, y)=(1, 0)
-(1) Number of iterations : 100
-(1) Elapsed Wtime       0.021007 s ( 94.2% CPU)
 (0) (x, y)=(0, 0)
 (0) Number of iterations : 100
-(0) Elapsed Wtime       0.020738 s ( 94.1% CPU)
+(0) Elapsed Wtime       0.019102 s ( 92.4% CPU)
+(1) (x, y)=(1, 0)
+(1) Number of iterations : 100
+(1) Elapsed Wtime       0.040566 s ( 43.8% CPU)
 (2) (x, y)=(2, 0)
 (2) Number of iterations : 100
-(2) Elapsed Wtime       0.021098 s ( 94.1% CPU)
+(2) Elapsed Wtime       0.019170 s ( 93.0% CPU)
 (3) (x, y)=(3, 0)
 (3) Number of iterations : 100
-(3) Elapsed Wtime       0.021152 s ( 94.3% CPU)
+(3) Elapsed Wtime       0.019091 s ( 93.8% CPU)
