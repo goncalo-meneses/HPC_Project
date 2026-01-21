@@ -20,10 +20,15 @@ with open('input.dat', 'r') as f:
 
 grid_x = params['nx']
 grid_y = params['ny']
-print(grid_x, grid_y)
+iterations = params['max iterations']
+print(grid_x, grid_y, iterations)
 EOF
 )
 
-echo "Parameters: grid=${grid_x}x${grid_y}"
+echo "Parameters: grid=${grid_x}x${grid_y}, iterations=${iterations}"
 
-srun MPI_Poisson 2 2 1.95 1 > ./step_9/output_g${grid_x}x${grid_y}_not_opt.log
+for topo in "2 2" "4 1"
+do
+    topo_file=$(echo $topo | tr ' ' 'x')
+    srun MPI_Poisson $topo 1.95 > ./step_3/output_t${topo_file}_g${grid_x}x${grid_y}_i${iterations}.log
+done

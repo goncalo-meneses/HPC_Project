@@ -10,8 +10,6 @@
 #include <mpi.h>
 
 #define DEBUG 0
-#define ERROR 1
-#define SWEEPS 1
 
 #define max(a,b) ((a)>(b)?a:b)
 
@@ -247,16 +245,11 @@ void Exchange_Borders()
 double Do_Step(int parity, double w)
 {
 	int x, y;
-	int y_start;
 	double old_phi;
 	double max_err = 0.0;
 
 	/* calculate interior of grid */
 	for (x = 1; x < dim[X_DIR] - 1; x++)
-	{
-		// y_start = (x + offset[X_DIR] - 1 + offset[Y_DIR] + parity) % 2; // x, y >= 1
-		// for (y = 1 + y_start; y < dim[Y_DIR] - 1; y += 2)
-			// if (source[x][y] != 1)
 		for (y = 1; y < dim[Y_DIR] - 1; y++)
 			if ((x + offset[X_DIR] + y + offset[Y_DIR]) % 2 == parity && source[x][y] != 1)
 			{
@@ -267,7 +260,6 @@ double Do_Step(int parity, double w)
 				if (max_err < fabs(old_phi - phi[x][y]))
 					max_err = fabs(old_phi - phi[x][y]);
 			}
-	}
 
 	return max_err;
 }
@@ -279,19 +271,8 @@ void Solve(int argc, char **argv)
     double global_delta;
 	double delta1, delta2;
 	int border_factor = 1;
-	
-	double w = 1.0;
 
-	FILE *f_err;
-
-	if (proc_rank == 0)
-	{
-		char error_filename[40];
-		sprintf(error_filename, "err_%i.dat", gridsize[X_DIR]);
-
-		if ((f_err = fopen(error_filename, "w")) == NULL)
-			Debug("Solve : fopen failed", 1);
-	}
+	double w = 1.0; 		/* SOR relaxation parameter */
 
 	if (argc > 3)
 	{
@@ -314,32 +295,18 @@ void Solve(int argc, char **argv)
 	{
 		Debug("Do_Step 0", 0);
 		if (count % border_factor == 0)
-		{
 			Exchange_Borders();
-		}
 		delta1 = Do_Step(0, w);
-
 
 		Debug("Do_Step 1", 0);
 		if (count % border_factor == 0)
-		{
 			Exchange_Borders();
-		}
 		delta2 = Do_Step(1, w);
 
 		delta = max(delta1, delta2);
-		MPI_Allreduce(&delta, &global_delta, 1, MPI_DOUBLE, MPI_MAX, grid_comm);
+        MPI_Allreduce(&delta, &global_delta, 1, MPI_DOUBLE, MPI_MAX, grid_comm);
 		count++;
-
-
-		if (ERROR && proc_rank == 0)
-		{
-			fprintf(f_err, "Number of iterations:\t %i\t Error:\t %.6f\n", count, delta);
-		}
 	}
-
-	if (proc_rank == 0)
-		fclose(f_err);
 
 	printf("(%i) Number of iterations : %i\n", proc_rank, count);
 }

@@ -48,8 +48,10 @@ double wtime;
 int offset[2];
 MPI_Datatype border_type[2];
 
+double w = 1.95; // SOR relaxation parameter
+
 void Setup_Grid();
-double Do_Step(int parity, double w);
+double Do_Step(int parity);
 void Solve();
 void Write_Grid();
 void Clean_Up();
@@ -244,7 +246,7 @@ void Exchange_Borders()
                  grid_comm, &status); // all traffic in the "right" direction
 }
 
-double Do_Step(int parity, double w)
+double Do_Step(int parity)
 {
 	int x, y;
 	int y_start;
@@ -254,11 +256,11 @@ double Do_Step(int parity, double w)
 	/* calculate interior of grid */
 	for (x = 1; x < dim[X_DIR] - 1; x++)
 	{
-		// y_start = (x + offset[X_DIR] - 1 + offset[Y_DIR] + parity) % 2; // x, y >= 1
-		// for (y = 1 + y_start; y < dim[Y_DIR] - 1; y += 2)
-			// if (source[x][y] != 1)
-		for (y = 1; y < dim[Y_DIR] - 1; y++)
-			if ((x + offset[X_DIR] + y + offset[Y_DIR]) % 2 == parity && source[x][y] != 1)
+		y_start = (x + offset[X_DIR] - 1 + offset[Y_DIR] + parity) % 2; // x, y >= 1
+		for (y = 1 + y_start; y < dim[Y_DIR] - 1; y += 2)
+			if (source[x][y] != 1)
+		// for (y = 1; y < dim[Y_DIR] - 1; y++)
+		// 	if ((x + offset[X_DIR] + y + offset[Y_DIR]) % 2 == parity && source[x][y] != 1)
 			{
 				old_phi = phi[x][y];
 				phi[x][y] = w * (phi[x + 1][y] + phi[x - 1][y] +
@@ -280,8 +282,6 @@ void Solve(int argc, char **argv)
 	double delta1, delta2;
 	int border_factor = 1;
 	
-	double w = 1.0;
-
 	FILE *f_err;
 
 	if (proc_rank == 0)
@@ -295,14 +295,9 @@ void Solve(int argc, char **argv)
 
 	if (argc > 3)
 	{
-		w = atof(argv[3]);
-	}
-
-	if (argc > 4)
-	{
-		border_factor = atoi(argv[4]);
+		border_factor = atoi(argv[3]);
 		if (border_factor <= 0)
-			Debug("Border factor must be an integer >= 1", 1);
+			Debug("Border factor must be >= 1", 1);
 	}
 
 	Debug("Solve", 0);
@@ -313,28 +308,22 @@ void Solve(int argc, char **argv)
 	while (global_delta > precision_goal && count < max_iter)
 	{
 		Debug("Do_Step 0", 0);
-		if (count % border_factor == 0)
-		{
-			Exchange_Borders();
-		}
-		delta1 = Do_Step(0, w);
-
+		Exchange_Borders();
+		delta1 = Do_Step(0);
 
 		Debug("Do_Step 1", 0);
-		if (count % border_factor == 0)
-		{
-			Exchange_Borders();
-		}
-		delta2 = Do_Step(1, w);
+		Exchange_Borders();
+		delta2 = Do_Step(1);
 
 		delta = max(delta1, delta2);
-		MPI_Allreduce(&delta, &global_delta, 1, MPI_DOUBLE, MPI_MAX, grid_comm);
+        MPI_Allreduce(&delta, &global_delta, 1, MPI_DOUBLE, MPI_MAX, grid_comm);
 		count++;
 
 
 		if (ERROR && proc_rank == 0)
 		{
-			fprintf(f_err, "Number of iterations:\t %i\t Error:\t %.6f\n", count, delta);
+
+		    fprintf(f_err, "Number of iterations:\t %i\t Error:\t %.6f\n", count, delta);
 		}
 	}
 
