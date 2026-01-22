@@ -1,19 +1,19 @@
 (0) (x, y)=(0, 0)
 (0) Number of iterations : 382
-(0) Border Exchange time:	0.002838 s
-(0) Elapsed Wtime       0.086117 s ( 68.2% CPU)
-Total Exchange_Borders time: 0.005840 s
+(0) Border Exchange time:	0.003696 s
+(0) Elapsed Wtime       0.103468 s ( 58.3% CPU)
+Total Exchange_Borders time: 0.017768 s
 Total data communicated: 12224000 bytes (12.22 MB)
-Bandwidth: 2093.13 MB/s
-(1) (x, y)=(1, 0)
-(1) Number of iterations : 382
-(1) Border Exchange time:	0.005020 s
-(1) Elapsed Wtime       0.062620 s ( 96.5% CPU)
-(2) (x, y)=(2, 0)
-(2) Number of iterations : 382
-(2) Border Exchange time:	0.005840 s
-(2) Elapsed Wtime       0.062180 s ( 98.1% CPU)
+Bandwidth: 687.99 MB/s
 (3) (x, y)=(3, 0)
 (3) Number of iterations : 382
-(3) Border Exchange time:	0.003102 s
-(3) Elapsed Wtime       0.079555 s ( 76.7% CPU)
+(3) Border Exchange time:	0.003572 s
+(3) Elapsed Wtime       0.085045 s ( 83.9% CPU)
+(2) (x, y)=(2, 0)
+(2) Number of iterations : 382
+(2) Border Exchange time:	0.017768 s
+(2) Elapsed Wtime       0.091838 s ( 78.2% CPU)
+(1) (x, y)=(1, 0)
+(1) Number of iterations : 382
+(1) Border Exchange time:	0.016483 s
+(1) Elapsed Wtime       0.076957 s ( 92.5% CPU)

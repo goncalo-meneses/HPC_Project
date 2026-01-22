@@ -1,0 +1,39 @@
+output_t2x2_g200x200
+Total Exchange_Borders time: 0.024489 s
+Total data communicated: 9779200 bytes (9.78 MB)
+Bandwidth: 399.33 MB/s
+
+output_t2x2_g400x400
+Total Exchange_Borders time: 0.113684 s
+Total data communicated: 61747200 bytes (61.75 MB)
+Bandwidth: 543.15 MB/s
+
+output_t2x2_g800x800
+Total Exchange_Borders time: 0.250784 s
+Total data communicated: 307507200 bytes (307.51 MB)
+Bandwidth: 1226.18 MB/s
+
+output_t2x2_g1600x1600
+Total Exchange_Borders time: 1.082104 s
+Total data communicated: 894976000 bytes (894.98 MB)
+Bandwidth: 827.07 MB/s
+
+output_t4x1_g200x200
+Total Exchange_Borders time: 0.017768 s
+Total data communicated: 12224000 bytes (12.22 MB)
+Bandwidth: 687.99 MB/s
+
+output_t4x1_g400x400
+Total Exchange_Borders time: 0.052000 s
+Total data communicated: 77184000 bytes (77.18 MB)
+Bandwidth: 1484.31 MB/s
+
+output_t4x1_g800x800
+Total Exchange_Borders time: 0.206461 s
+Total data communicated: 384384000 bytes (384.38 MB)
+Bandwidth: 1861.78 MB/s
+
+output_t4x1_g1600x1600
+Total Exchange_Borders time: 0.614385 s
+Total data communicated: 1118720000 bytes (1118.72 MB)
+Bandwidth: 1820.88 MB/s
