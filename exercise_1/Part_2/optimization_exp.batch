@@ -1,0 +1,29 @@
+#!/bin/bash
+#SBATCH --job-name=poisson_solver
+#SBATCH --partition=compute-p1
+#SBATCH --account=Education-EEMCS-Courses-WI4049TU
+#SBATCH --time=00:03:00
+#SBATCH --ntasks=4
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=1GB
+module load 2025
+module load openmpi
+module load slurm
+
+read grid_x grid_y iterations < <(python3 << EOF
+with open('input.dat', 'r') as f:
+    params = {}
+    for line in f:
+        if ':' in line and not line.strip().startswith('source'):
+            key, val = line.split(':', 1)
+            params[key.strip()] = val.strip()
+
+grid_x = params['nx']
+grid_y = params['ny']
+print(grid_x, grid_y)
+EOF
+)
+
+echo "Parameters: grid=${grid_x}x${grid_y}"
+
+srun MPI_Poisson 2 2 1.95 1 > ./step_9/output_g${grid_x}x${grid_y}_not_opt.log

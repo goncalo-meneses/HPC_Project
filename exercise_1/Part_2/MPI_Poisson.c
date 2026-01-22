@@ -45,6 +45,11 @@ MPI_Status status;
 
 double wtime;
 
+double exchange_time = 0.0;
+double exchange_start;
+
+long data_communicated = 0;
+
 int offset[2];
 MPI_Datatype border_type[2];
 
@@ -227,6 +232,8 @@ void Exchange_Borders()
 {
     Debug("Exchange_Borders", 0);
 
+	exchange_start = MPI_Wtime();
+
     MPI_Sendrecv(&phi[1][1], 1, border_type[Y_DIR], proc_top, 0, 
                  &phi[1][dim[Y_DIR] - 1], 1, border_type[Y_DIR], proc_bottom, 0, 
                  grid_comm, &status); // all traffic in the "top" direction
@@ -242,6 +249,10 @@ void Exchange_Borders()
     MPI_Sendrecv(&phi[dim[X_DIR] - 2][1], 1, border_type[X_DIR], proc_right, 0, 
                  &phi[0][1], 1, border_type[X_DIR], proc_left, 0, 
                  grid_comm, &status); // all traffic in the "right" direction
+
+	exchange_time += MPI_Wtime() - exchange_start;
+
+	data_communicated += 2 * (dim[X_DIR] - 2) + 2 * (dim[Y_DIR] - 2);
 }
 
 double Do_Step(int parity, double w)
@@ -342,6 +353,7 @@ void Solve(int argc, char **argv)
 		fclose(f_err);
 
 	printf("(%i) Number of iterations : %i\n", proc_rank, count);
+	printf("(%i) Border Exchange time:\t%.6f s\n", proc_rank, exchange_time);
 }
 
 void Write_Grid()
@@ -431,6 +443,22 @@ int main(int argc, char **argv)
 	Write_Grid();
 
 	print_timer();
+
+	long total_data_communicated;
+	MPI_Reduce(&data_communicated, &total_data_communicated, 1, MPI_LONG, MPI_SUM, 0, grid_comm);
+
+	double max_exchange_time;
+	MPI_Reduce(&exchange_time, &max_exchange_time, 1, MPI_DOUBLE, MPI_MAX, 0, grid_comm);
+
+	if (proc_rank == 0)
+	{
+		long bytes = total_data_communicated * sizeof(double);
+		double bandwidth = bytes / max_exchange_time;  // bytes/s
+
+    	printf("Total Exchange_Borders time: %f s\n", max_exchange_time);
+		printf("Total data communicated: %ld bytes (%.2f MB)\n", bytes, bytes / 1e6);
+	    printf("Bandwidth: %.2f MB/s\n", bandwidth / 1e6);
+	}
 
 	Clean_Up();
 

@@ -26,4 +26,8 @@ EOF
 
 echo "Parameters: grid=${grid_x}x${grid_y}"
 
-srun MPI_Poisson 2 2 1.95 1 > ./step_9/output_g${grid_x}x${grid_y}_not_opt.log
+for topo in "2 2" "4 1"
+do
+    topo_file=$(echo $topo | tr ' ' 'x')
+    srun MPI_Poisson $topo 1.95 1 > ./step_11/output_t${topo_file}_g${grid_x}x${grid_y}.log
+done
