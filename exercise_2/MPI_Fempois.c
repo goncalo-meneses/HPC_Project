@@ -46,6 +46,20 @@ clock_t ticks;                  /* number of systemticks */
 double wtime;                   /* wallclock time */
 int timer_on = 0;               /* is timer running? */
 
+double computation_time = 0;
+double computation_start;
+
+double exchange_time = 0;
+double exchange_start;
+
+double global_comm_time = 0;
+double global_comm_start;
+
+double solve_time = 0;
+double solve_start;
+
+double idle_time = 0;
+
 /* local process related variables */
 int proc_rank;                  /* rank of current process */
 int proc_coord[2];              /* coordinates of current procces in processgrid */
@@ -425,11 +439,14 @@ void Setup_MPI_Datatypes(FILE *f)
 
 void Exchange_Borders(double *vect)
 {
-    // Please finish this part to realize the purpose of data communication among neighboring processors. (Tip: the function "MPI_Sendrecv" needs to be used here.)
+    exchange_start = MPI_Wtime();
+
     for (int i = 0; i < N_neighb; i++)
     {
         MPI_Sendrecv(vect, 1, send_type[i], proc_neighb[i], 0, vect, 1, recv_type[i], proc_neighb[i], 0, grid_comm, &status);
     }
+
+    exchange_time += MPI_Wtime() - exchange_start;
 }
 
 void Solve()
@@ -452,6 +469,8 @@ void Solve()
 
     /* Implementation of the CG algorithm : */
 
+    solve_start = MPI_Wtime();
+  
     Exchange_Borders(phi);
 
     /* r = b-Ax */
@@ -465,12 +484,24 @@ void Solve()
     r1 = 2 * precision_goal;
     while ((count < max_iter) && (r1 > precision_goal))
     {
+        computation_start = MPI_Wtime();
+
         /* r1 = r' * r */
         sub = 0.0;
         for (i = 0; i < N_vert; i++)
             if (!(vert[i].type & TYPE_GHOST))
                 sub += r[i] * r[i];
+
+        computation_time += MPI_Wtime() - computation_start;
+
+        global_comm_start = MPI_Wtime();
+        
         MPI_Allreduce(&sub, &r1, 1, MPI_DOUBLE, MPI_SUM, grid_comm);
+
+        global_comm_time += MPI_Wtime() - global_comm_start;
+
+
+        computation_start = MPI_Wtime();
 
         if (count == 0)
         {
@@ -486,7 +517,12 @@ void Solve()
             for (i = 0; i < N_vert; i++)
                 p[i] = r[i] + b * p[i];
         }
+
+        computation_time += MPI_Wtime() - computation_start;
+
         Exchange_Borders(p);
+
+        computation_start = MPI_Wtime();
 
         /* q = A * p */
         for (i = 0; i < N_vert; i++)
@@ -501,7 +537,17 @@ void Solve()
         for (i = 0; i < N_vert; i++)
             if (!(vert[i].type & TYPE_GHOST))
                 sub += p[i] * q[i];
+
+        computation_time += MPI_Wtime() - computation_start;
+
+        global_comm_start = MPI_Wtime();
+
         MPI_Allreduce(&sub, &a, 1, MPI_DOUBLE, MPI_SUM, grid_comm);
+
+        global_comm_time += MPI_Wtime() - global_comm_start;
+
+        computation_start = MPI_Wtime();
+
         a = r1 / a;
 
         /* x = x + a*p */
@@ -514,8 +560,21 @@ void Solve()
 
         r2 = r1;
 
+        computation_time += MPI_Wtime() - computation_start;
+
         count++;
     }
+
+    solve_time += MPI_Wtime() - solve_start;
+
+    idle_time = solve_time - computation_time - exchange_time - global_comm_time;
+
+    printf("(%i) Solve time:       %14.6f s\n", proc_rank, solve_time);
+    printf("(%i) Computation:      %14.6f s (%5.1f%%)\n", proc_rank, computation_time, 100.0 * computation_time / solve_time);
+    printf("(%i) Exchange:         %14.6f s (%5.1f%%)\n", proc_rank, exchange_time, 100.0 * exchange_time / solve_time);
+    printf("(%i) Global comm:      %14.6f s (%5.1f%%)\n", proc_rank, global_comm_time, 100.0 * global_comm_time / solve_time);
+    printf("(%i) Idle:             %14.6f s (%5.1f%%)\n", proc_rank, idle_time, 100.0 * idle_time / solve_time);
+
     free(q);
     free(p);
     free(r);
