@@ -1,0 +1,162 @@
+===Config: 1 4, Size: 100x100 ===
+(2) Solve time:             0.018648 s
+(2) Computation:            0.017014 s ( 91.2%)
+(2) Exchange:               0.001195 s (  6.4%)
+(2) Global comm:            0.000312 s (  1.7%)
+(2) Idle:                   0.000127 s (  0.7%)
+(2) Elapsed Wtime:       0.059819 s ( 94.8% CPU)
+(1) Solve time:             0.018624 s
+(1) Computation:            0.016735 s ( 89.9%)
+(1) Exchange:               0.000833 s (  4.5%)
+(1) Global comm:            0.000930 s (  5.0%)
+(1) Idle:                   0.000126 s (  0.7%)
+(1) Elapsed Wtime:       0.060129 s ( 93.9% CPU)
+(0) Solve time:             0.018740 s
+(0) Computation:            0.016114 s ( 86.0%)
+(0) Exchange:               0.000657 s (  3.5%)
+(0) Global comm:            0.001847 s (  9.9%)
+(0) Idle:                   0.000122 s (  0.7%)
+Number of iterations : 141
+(0) Elapsed Wtime:       0.060208 s ( 93.7% CPU)
+(3) Solve time:             0.018722 s
+(3) Computation:            0.016251 s ( 86.8%)
+(3) Exchange:               0.001394 s (  7.4%)
+(3) Global comm:            0.000953 s (  5.1%)
+(3) Idle:                   0.000124 s (  0.7%)
+(3) Elapsed Wtime:       0.059732 s ( 95.6% CPU)
+
+===Config: 1 4, Size: 200x200 ===
+(2) Solve time:             0.139142 s
+(2) Computation:            0.133183 s ( 95.7%)
+(2) Exchange:               0.003251 s (  2.3%)
+(2) Global comm:            0.002163 s (  1.6%)
+(2) Idle:                   0.000545 s (  0.4%)
+(2) Elapsed Wtime:       0.200717 s ( 98.0% CPU)
+(3) Solve time:             0.139376 s
+(3) Computation:            0.130358 s ( 93.5%)
+(3) Exchange:               0.003901 s (  2.8%)
+(3) Global comm:            0.004585 s (  3.3%)
+(3) Idle:                   0.000532 s (  0.4%)
+(3) Elapsed Wtime:       0.200761 s ( 97.8% CPU)
+(1) Solve time:             0.139094 s
+(1) Computation:            0.133221 s ( 95.8%)
+(1) Exchange:               0.002172 s (  1.6%)
+(1) Global comm:            0.003172 s (  2.3%)
+(1) Idle:                   0.000529 s (  0.4%)
+(1) Elapsed Wtime:       0.201063 s ( 97.6% CPU)
+(0) Solve time:             0.139287 s
+(0) Computation:            0.130764 s ( 93.9%)
+(0) Exchange:               0.001802 s (  1.3%)
+(0) Global comm:            0.006204 s (  4.5%)
+(0) Idle:                   0.000518 s (  0.4%)
+Number of iterations : 274
+(0) Elapsed Wtime:       0.201049 s ( 97.1% CPU)
+
+===Config: 1 4, Size: 400x400 ===
+(2) Solve time:             1.236927 s
+(2) Computation:            1.209346 s ( 97.8%)
+(2) Exchange:               0.008307 s (  0.7%)
+(2) Global comm:            0.017026 s (  1.4%)
+(2) Idle:                   0.002249 s (  0.2%)
+(2) Elapsed Wtime:       1.379812 s ( 99.3% CPU)
+(0) Solve time:             1.237885 s
+(0) Computation:            1.192848 s ( 96.4%)
+(0) Exchange:               0.005189 s (  0.4%)
+(0) Global comm:            0.037726 s (  3.0%)
+(0) Idle:                   0.002123 s (  0.2%)
+Number of iterations : 529
+(0) Elapsed Wtime:       1.380659 s ( 99.2% CPU)
+(1) Solve time:             1.237000 s
+(1) Computation:            1.212565 s ( 98.0%)
+(1) Exchange:               0.006085 s (  0.5%)
+(1) Global comm:            0.016160 s (  1.3%)
+(1) Idle:                   0.002190 s (  0.2%)
+(1) Elapsed Wtime:       1.380387 s ( 99.3% CPU)
+(3) Solve time:             1.237949 s
+(3) Computation:            1.200184 s ( 96.9%)
+(3) Exchange:               0.010766 s (  0.9%)
+(3) Global comm:            0.024842 s (  2.0%)
+(3) Idle:                   0.002157 s (  0.2%)
+(3) Elapsed Wtime:       1.379961 s ( 99.3% CPU)
+
+===Config: 2 2, Size: 100x100 ===
+(1) Solve time:             0.018817 s
+(1) Computation:            0.016389 s ( 87.1%)
+(1) Exchange:               0.001319 s (  7.0%)
+(1) Global comm:            0.000984 s (  5.2%)
+(1) Idle:                   0.000126 s (  0.7%)
+(1) Elapsed Wtime:       0.061514 s ( 92.2% CPU)
+(0) Solve time:             0.018766 s
+(0) Computation:            0.016427 s ( 87.5%)
+(0) Exchange:               0.000742 s (  4.0%)
+(0) Global comm:            0.001472 s (  7.8%)
+(0) Idle:                   0.000125 s (  0.7%)
+Number of iterations : 141
+(0) Elapsed Wtime:       0.061628 s ( 91.0% CPU)
+(2) Solve time:             0.018797 s
+(2) Computation:            0.016467 s ( 87.6%)
+(2) Exchange:               0.001785 s (  9.5%)
+(2) Global comm:            0.000422 s (  2.2%)
+(2) Idle:                   0.000123 s (  0.7%)
+(2) Elapsed Wtime:       0.064880 s ( 87.4% CPU)
+(3) Solve time:             0.018733 s
+(3) Computation:            0.016359 s ( 87.3%)
+(3) Exchange:               0.001647 s (  8.8%)
+(3) Global comm:            0.000604 s (  3.2%)
+(3) Idle:                   0.000122 s (  0.7%)
+(3) Elapsed Wtime:       0.058980 s ( 96.0% CPU)
+
+===Config: 2 2, Size: 200x200 ===
+(3) Solve time:             0.138228 s
+(3) Computation:            0.130849 s ( 94.7%)
+(3) Exchange:               0.004574 s (  3.3%)
+(3) Global comm:            0.002294 s (  1.7%)
+(3) Idle:                   0.000511 s (  0.4%)
+(3) Elapsed Wtime:       0.199099 s ( 98.3% CPU)
+(0) Solve time:             0.138197 s
+(0) Computation:            0.131265 s ( 95.0%)
+(0) Exchange:               0.002007 s (  1.5%)
+(0) Global comm:            0.004414 s (  3.2%)
+(0) Idle:                   0.000511 s (  0.4%)
+Number of iterations : 274
+(0) Elapsed Wtime:       0.199383 s ( 97.7% CPU)
+(2) Solve time:             0.138146 s
+(2) Computation:            0.131705 s ( 95.3%)
+(2) Exchange:               0.004547 s (  3.3%)
+(2) Global comm:            0.001383 s (  1.0%)
+(2) Idle:                   0.000511 s (  0.4%)
+(2) Elapsed Wtime:       0.227941 s ( 85.3% CPU)
+(1) Solve time:             0.138216 s
+(1) Computation:            0.131004 s ( 94.8%)
+(1) Exchange:               0.003462 s (  2.5%)
+(1) Global comm:            0.003241 s (  2.3%)
+(1) Idle:                   0.000510 s (  0.4%)
+(1) Elapsed Wtime:       0.199359 s ( 98.1% CPU)
+
+===Config: 2 2, Size: 400x400 ===
+(1) Solve time:             1.200521 s
+(1) Computation:            1.173816 s ( 97.8%)
+(1) Exchange:               0.007172 s (  0.6%)
+(1) Global comm:            0.017414 s (  1.5%)
+(1) Idle:                   0.002119 s (  0.2%)
+(1) Elapsed Wtime:       1.342985 s ( 99.3% CPU)
+(2) Solve time:             1.200600 s
+(2) Computation:            1.176784 s ( 98.0%)
+(2) Exchange:               0.009805 s (  0.8%)
+(2) Global comm:            0.011966 s (  1.0%)
+(2) Idle:                   0.002045 s (  0.2%)
+(2) Elapsed Wtime:       1.343221 s ( 99.4% CPU)
+(3) Solve time:             1.200577 s
+(3) Computation:            1.173826 s ( 97.8%)
+(3) Exchange:               0.009802 s (  0.8%)
+(3) Global comm:            0.014912 s (  1.2%)
+(3) Idle:                   0.002037 s (  0.2%)
+(3) Elapsed Wtime:       1.343117 s ( 99.3% CPU)
+(0) Solve time:             1.200657 s
+(0) Computation:            1.166573 s ( 97.2%)
+(0) Exchange:               0.004877 s (  0.4%)
+(0) Global comm:            0.027153 s (  2.3%)
+(0) Idle:                   0.002054 s (  0.2%)
+Number of iterations : 529
+(0) Elapsed Wtime:       1.343150 s ( 99.3% CPU)
+
