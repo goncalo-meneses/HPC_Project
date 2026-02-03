@@ -197,7 +197,7 @@ __global__ void ComputeLamda(float* g_VecV,float* g_VecW, float* g_Lamda, int N)
 
     if (t_idx == 0)
     {
-        atomicAdd(g_NormW, partial_sum[0]);
+        atomicAdd(g_Lamda, partial_sum[0]);
     }
 }
 
@@ -320,8 +320,16 @@ int main(int argc, char** argv)
 
     cudaMalloc((void**)&d_Lamda, sizeof(float));
 
-    AvProduct<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_MatA, d_VecV, d_VecW, N);
+    AvProduct<<<blocksPerGrid, threadsPerBlock>>>(d_MatA, d_VecV, d_VecW, N);
     cudaDeviceSynchronize();
+    
+    // =============
+    //   Debugging
+    // =============
+    // cudaError_t err = cudaGetLastError();
+    // if (err != cudaSuccess) {
+    //     printf("AvProduct error: %s\n", cudaGetErrorString(err));
+    // }
 
     for (int i=0; i < max_iteration; i++)
     {
@@ -330,18 +338,33 @@ int main(int argc, char** argv)
 
         FindNormW<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_VecW, d_NormW, N);
         cudaDeviceSynchronize();
+        // if (err != cudaSuccess) {
+        //     printf("AvProduct error: %s\n", cudaGetErrorString(err));
+        // }
 
         cudaMemcpy(h_NormW, d_NormW, norm_size, cudaMemcpyDeviceToHost);
+        // printf("DEBUG: h_NormW = %f\n", *h_NormW);
+
         float norm = sqrt(*h_NormW);
+        // printf("DEBUG: norm = %f\n", norm);
 
-        NormalizeW<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_VecV, d_VecW, norm, N);
+        NormalizeW<<<blocksPerGrid, threadsPerBlock>>>(d_VecV, d_VecW, norm, N);
         cudaDeviceSynchronize();
+        // if (err != cudaSuccess) {
+        //     printf("AvProduct error: %s\n", cudaGetErrorString(err));
+        // }
 
-        AvProduct<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_MatA, d_VecV, d_VecW, N);
+        AvProduct<<<blocksPerGrid, threadsPerBlock>>>(d_MatA, d_VecV, d_VecW, N);
         cudaDeviceSynchronize();
+        // if (err != cudaSuccess) {
+        //     printf("AvProduct error: %s\n", cudaGetErrorString(err));
+        // }
     
         ComputeLamda<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_VecV, d_VecW, d_Lamda, N);
         cudaDeviceSynchronize();
+        // if (err != cudaSuccess) {
+        //     printf("AvProduct error: %s\n", cudaGetErrorString(err));
+        // }
 
         cudaMemcpy(&h_Lamda, d_Lamda, sizeof(float), cudaMemcpyDeviceToHost);
 
