@@ -330,7 +330,7 @@ int main(int argc, char** argv)
         NormalizeW<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_VecV, d_VecW, norm, N);
         cudaDeviceSynchronize();
 
-        AvProduct<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_MatA, d_VecV, d_VecW, N);
+        global_AvProduct<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_MatA, d_VecV, d_VecW, N);
         cudaDeviceSynchronize();
     
         ComputeLamda<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_VecV, d_VecW, d_Lamda, N);
