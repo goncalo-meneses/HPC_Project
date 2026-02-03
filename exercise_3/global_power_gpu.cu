@@ -46,7 +46,7 @@ void checkCardVersion(void);
 // Kernels
 __global__ void AvProduct(float* g_MatA, float* g_VecV, float* g_VecW, int N);
 __global__ void FindNormW(float* g_VecW, float * g_NormW, int N);
-__global__ void NormalizeW(float* g_VecV,float* g_VecW, float norm, int N);
+__global__ void NormalizeW(float* g_VecV,float* g_VecW, float norm, int N);             // also used by shared memory
 __global__ void ComputeLamda( float* g_VecV,float* g_VecW, float * g_Lamda, int N);
 
 
@@ -67,78 +67,34 @@ void CPU_AvProduct()
 
 __global__ void AvProduct(float* g_MatA, float* g_VecV, float* g_VecW, int N)
 {
-    int b_idx = blockIdx.x;     // block index
-    int t_idx = threadIdx.x;    // thread index
+    int matIndex = 0;
+    int workIndex = threadIdx.x + blockIdx.x * blockDim.x;
 
-    int a_begin = N * b_idx * BLOCK_SIZE;
-    int a_end = a_begin + N;
-
-    int step = BLOCK_SIZE;
-
-    int v_begin = 0;      // BLOCK_SIZE * b_idx
-    int v_idx = 0;
-    int a_idx = 0;
-    float w_sub = 0;      // vector w for each block vector subspace
-
-    for (int a = a_begin, v = v_begin; a < a_end; a += step, v += step)
+    if (workIndex < N)
     {
-        __shared__ float A_sub[BLOCK_SIZE * BLOCK_SIZE];
-        __shared__ float v_sub[BLOCK_SIZE];
-
-        for (int aa = 0; aa < BLOCK_SIZE; aa++)
+        g_VecW[workIndex] = 0;
+        for (int j=0; j < N; j++)
         {
-            a_idx = a + t_idx + aa * N;
-            if (a_idx < N * N)
-                A_sub[t_idx + aa * BLOCK_SIZE] = g_MatA[a_idx];
-            else
-                A_sub[t_idx + aa * BLOCK_SIZE] = 0;
+            matIndex = workIndex * N + j;
+            g_VecW[workIndex] += g_MatA[matIndex] * g_VecV[j];
         }
-
-        v_idx = t_idx + v;
-        if (v_idx < N)
-            v_sub[t_idx] = g_VecV[v_idx];
-        else
-            v_sub[t_idx] = 0;
-
-        __syncthreads();
-
-        for (int k = 0; k < BLOCK_SIZE; k++)
-        {
-            w_sub += A_sub[k + t_idx * BLOCK_SIZE] * v_sub[k];
-        }
-        __syncthreads();
     }
-
-    g_VecW[BLOCK_SIZE * b_idx + t_idx] = w_sub;
 }
 
 __global__ void FindNormW(float* g_VecW, float * g_NormW, int N)
 {
-    extern __shared__ float partial_sum[];
+    unsigned int g_idx = threadIdx.x + blockDim.x * blockIdx.x;
 
-    int t_idx = threadIdx.x;
-    int g_idx = blockIdx.x * blockDim.x + threadIdx.x;
-
-    // Square every thread's element
     if (g_idx < N)
-        partial_sum[t_idx] = g_VecW[g_idx] * g_VecW[g_idx];
-    else
-        partial_sum[t_idx] = 0;
+        atomicAdd(g_NormW, g_VecW[g_idx] * g_VecW[g_idx]);
+}
 
-    __syncthreads();
+__global__ void ComputeLamda( float* g_VecV,float* g_VecW, float * g_Lamda, int N)
+{
+    unsigned int g_idx = threadIdx.x + blockDim.x * blockIdx.x;
 
-    // Parallel reduction within each block
-    for (int stride = BLOCK_SIZE / 2; stride > 0; stride /= 2)
-    {
-        if (t_idx < stride)
-            partial_sum[t_idx] += partial_sum[t_idx + stride];
-        __syncthreads();
-    }
-
-    if (t_idx == 0)
-    {
-        atomicAdd(g_NormW, partial_sum[0]);
-    }
+    if (g_idx < N)
+        atomicAdd(g_Lamda, g_VecV[g_idx] * g_VecW[g_idx]);
 }
 
 __global__ void NormalizeW(float* g_VecV,float* g_VecW, float norm, int N)
@@ -147,35 +103,6 @@ __global__ void NormalizeW(float* g_VecV,float* g_VecW, float norm, int N)
 
     if (g_idx < N)
         g_VecV[g_idx] = g_VecW[g_idx] / norm;
-}
-
-__global__ void ComputeLamda(float* g_VecV,float* g_VecW, float* g_Lamda, int N)
-{
-    extern __shared__ float partial_sum[];
-
-    int t_idx = threadIdx.x;
-    int g_idx = blockIdx.x * blockDim.x + threadIdx.x;
-
-    // Square every thread's element
-    if (g_idx < N)
-        partial_sum[t_idx] = g_VecV[g_idx] * g_VecW[g_idx];
-    else
-        partial_sum[t_idx] = 0;
-
-    __syncthreads();
-
-    // Parallel reduction within each block
-    for (int stride = BLOCK_SIZE / 2; stride > 0; stride /= 2)
-    {
-        if (t_idx < stride)
-            partial_sum[t_idx] += partial_sum[t_idx + stride];
-        __syncthreads();
-    }
-
-    if (t_idx == 0)
-    {
-        atomicAdd(g_Lamda, partial_sum[0]);
-    }
 }
 
 void CPU_NormalizeW()
