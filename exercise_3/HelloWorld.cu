@@ -13,7 +13,7 @@ void checkCudaError(const char *error)
 {
    if (cudaGetLastError() != cudaSuccess)
    {
-      fprintf (stderr, "Cuda : %s\n",error);
+      fprintf(stderr, "Cuda : %s\n", error);
       exit(EXIT_FAILURE);
    }
 }
