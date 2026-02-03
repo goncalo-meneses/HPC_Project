@@ -402,6 +402,11 @@ void Arguments(int argc, char** argv)
             max_iteration = atoi(argv[i+1]);
 		    i = i + 1;
         }
+        if (strcmp(argv[i], "--block_size") == 0 || strcmp(argv[i], "-block_size") == 0)
+        {
+            block_size = atoi(argv[i+1]);
+		    i = i + 1;
+        }
     }
 }
 
