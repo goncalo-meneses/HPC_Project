@@ -10,8 +10,9 @@
 #include <time.h>
 #include "cuda.h"
 
-
-const int BLOCK_SIZE = 32;  // number of threads per block
+#ifndef BLOCK_SIZE
+#define BLOCK_SIZE 32
+#endif
 
 // Input Array Variables
 float* h_MatA = NULL;
@@ -30,7 +31,7 @@ float* d_Lamda;
 
 // Variables to change
 int GlobalSize = 5000;         // this is the dimension of the matrix, GlobalSize*GlobalSize
-int BlockSize = 32;            // number of threads in each block
+int BlockSize = BLOCK_SIZE;            // number of threads in each block
 const float EPS = 0.000005;    // tolerence of the error
 int max_iteration = 100;       // the maximum iteration steps
 
@@ -70,28 +71,28 @@ __global__ void AvProduct(float* g_MatA, float* g_VecV, float* g_VecW, int N)
     int b_idx = blockIdx.x;     // block index
     int t_idx = threadIdx.x;    // thread index
 
-    int a_begin = N * b_idx * BlockSize;
+    int a_begin = N * b_idx * BLOCK_SIZE;
     int a_end = a_begin + N;
 
-    int step = BlockSize;
+    int step = BLOCK_SIZE;
 
-    int v_begin = 0;      // BlockSize * b_idx
+    int v_begin = 0;      // BLOCK_SIZE * b_idx
     int v_idx = 0;
     int a_idx = 0;
     float w_sub = 0;      // vector w for each block vector subspace
 
     for (int a = a_begin, v = v_begin; a < a_end; a += step, v += step)
     {
-        __shared__ float A_sub[BlockSize * BlockSize];
-        __shared__ float v_sub[BlockSize];
+        __shared__ float A_sub[BLOCK_SIZE * BLOCK_SIZE];
+        __shared__ float v_sub[BLOCK_SIZE];
 
-        for (int aa = 0; aa < BlockSize; aa++)
+        for (int aa = 0; aa < BLOCK_SIZE; aa++)
         {
             a_idx = a + t_idx + aa * N;
             if (a_idx < N * N)
-                A_sub[t_idx + aa * BlockSize] = g_MatA[a_idx];
+                A_sub[t_idx + aa * BLOCK_SIZE] = g_MatA[a_idx];
             else
-                A_sub[t_idx + aa * BlockSize] = 0;
+                A_sub[t_idx + aa * BLOCK_SIZE] = 0;
         }
 
         v_idx = t_idx + v;
@@ -102,14 +103,14 @@ __global__ void AvProduct(float* g_MatA, float* g_VecV, float* g_VecW, int N)
 
         __syncthreads();
 
-        for (int k = 0; k < BlockSize; k++)
+        for (int k = 0; k < BLOCK_SIZE; k++)
         {
-            w_sub += A_sub[k + t_idx * BlockSize] * v_sub[k];
+            w_sub += A_sub[k + t_idx * BLOCK_SIZE] * v_sub[k];
         }
         __syncthreads();
     }
 
-    g_VecW[BlockSize * b_idx + t_idx] = w_sub;
+    g_VecW[BLOCK_SIZE * b_idx + t_idx] = w_sub;
 }
 
 __global__ void FindNormW(float* g_VecW, float * g_NormW, int N)
@@ -128,7 +129,7 @@ __global__ void FindNormW(float* g_VecW, float * g_NormW, int N)
     __syncthreads();
 
     // Parallel reduction within each block
-    for (int stride = BlockSize / 2; stride > 0; stride /= 2)
+    for (int stride = BLOCK_SIZE / 2; stride > 0; stride /= 2)
     {
         if (t_idx < stride)
             partial_sum[t_idx] += partial_sum[t_idx + stride];
@@ -165,7 +166,7 @@ __global__ void ComputeLamda(float* g_VecV,float* g_VecW, float* g_Lamda, int N)
     __syncthreads();
 
     // Parallel reduction within each block
-    for (int stride = BlockSize / 2; stride > 0; stride /= 2)
+    for (int stride = BLOCK_SIZE / 2; stride > 0; stride /= 2)
     {
         if (t_idx < stride)
             partial_sum[t_idx] += partial_sum[t_idx + stride];
@@ -400,11 +401,6 @@ void Arguments(int argc, char** argv)
         if (strcmp(argv[i], "--max_iteration") == 0 || strcmp(argv[i], "-max_iteration") == 0)
         {
             max_iteration = atoi(argv[i+1]);
-		    i = i + 1;
-        }
-        if (strcmp(argv[i], "--BlockSize") == 0 || strcmp(argv[i], "-BlockSize") == 0)
-        {
-            BlockSize = atoi(argv[i+1]);
 		    i = i + 1;
         }
     }
