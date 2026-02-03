@@ -216,6 +216,8 @@ int main(int argc, char** argv)
 	// cutilCheckError(cutStopTimer(timer_mem));
 	
     //Power method loops
+    printf("*************************************\n");
+
     float oldLamda = 0;
     float lamda = 0;
     float h_Lamda;
@@ -255,6 +257,7 @@ int main(int argc, char** argv)
 			break;
 		oldLamda = lamda;	
     }
+    printf("*************************************\n");
     
     clock_gettime(CLOCK_REALTIME,&t_end);
     runtime = (t_end.tv_sec - t_start.tv_sec) + 1e-9*(t_end.tv_nsec - t_start.tv_nsec);
