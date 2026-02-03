@@ -191,7 +191,7 @@ int main(int argc, char** argv)
     
     /////////////////////////////////////////////////
     // This is the starting points of GPU
-    printf("Power method in GPU starts\n");
+    printf("\nPower method in GPU starts\n");
     checkCardVersion();
 
     // Initialize input matrix
