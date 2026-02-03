@@ -129,11 +129,22 @@ __global__ void FindNormW(float* g_VecW, float * g_NormW, int N)
     __syncthreads();
 
     // Parallel reduction within each block
-    for (int stride = BLOCK_SIZE / 2; stride > 0; stride /= 2)
+    unsigned int n = blockDim.x;
+    while (n > 1)
     {
-        if (t_idx < stride)
-            partial_sum[t_idx] += partial_sum[t_idx + stride];
+        unsigned int half = n / 2;
+
+        if (t_idx < half)
+            partial_sum[t_idx] += partial_sum[t_idx + half];
+
         __syncthreads();
+
+        if ((n % 2 == 1) && t_idx == 0)
+            partial_sum[0] += partial_sum[n - 1];
+
+        __syncthreads();
+
+        n = half;
     }
 
     if (t_idx == 0)
@@ -166,16 +177,27 @@ __global__ void ComputeLamda(float* g_VecV,float* g_VecW, float* g_Lamda, int N)
     __syncthreads();
 
     // Parallel reduction within each block
-    for (int stride = BLOCK_SIZE / 2; stride > 0; stride /= 2)
+    unsigned int n = blockDim.x;
+    while (n > 1)
     {
-        if (t_idx < stride)
-            partial_sum[t_idx] += partial_sum[t_idx + stride];
+        unsigned int half = n / 2;
+
+        if (t_idx < half)
+            partial_sum[t_idx] += partial_sum[t_idx + half];
+
         __syncthreads();
+
+        if ((n % 2 == 1) && t_idx == 0)
+            partial_sum[0] += partial_sum[n - 1];
+
+        __syncthreads();
+
+        n = half;
     }
 
     if (t_idx == 0)
     {
-        atomicAdd(g_Lamda, partial_sum[0]);
+        atomicAdd(g_NormW, partial_sum[0]);
     }
 }
 
