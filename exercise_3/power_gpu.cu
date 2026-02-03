@@ -404,7 +404,7 @@ void Arguments(int argc, char** argv)
         }
         if (strcmp(argv[i], "--block_size") == 0 || strcmp(argv[i], "-block_size") == 0)
         {
-            block_size = atoi(argv[i+1]);
+            BlockSize = atoi(argv[i+1]);
 		    i = i + 1;
         }
     }
