@@ -17,5 +17,5 @@ do
     for block_size in 32 64 100
     do
         srun build/power_gpu_${block_size}.x -size $m_size > ./step_2/output_s${m_size}_b${block_size}.out
-    end
-end
+    done
+done
