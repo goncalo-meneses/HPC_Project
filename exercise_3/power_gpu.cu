@@ -256,7 +256,6 @@ void RunCPUPowerMethod()
 // Host code
 int main(int argc, char** argv)
 {
-    double kernel_time = 0;
     double memcpy_time = 0;
     struct timespec t1, t2;
 
@@ -301,6 +300,8 @@ int main(int argc, char** argv)
     // Initialize input matrix
     InitOne(h_VecV,N);
     
+    clock_gettime(CLOCK_REALTIME, &t_start);  // Here I start to count
+
     // Set the kernel arguments
     int threadsPerBlock = BlockSize;   
     int sharedMemSize = threadsPerBlock * threadsPerBlock * sizeof(float); // in per block, the memory is shared   
@@ -321,7 +322,6 @@ int main(int argc, char** argv)
     //Power method loops
     printf("*************************************\n");
 
-    clock_gettime(CLOCK_REALTIME, &t_start);  // Here I start to count
 
     float oldLamda = 0;
     float lamda = 0;
