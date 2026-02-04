@@ -12,7 +12,7 @@ module load openmpi
 module load slurm
 module load cuda
 
-for m_size in 2000 4000 8000 10000
+for m_size in 500 2000 4000 8000 10000
 do
     srun build/power_gpu_32.x -size $m_size > ./step_1/shared_s${m_size}.out
     srun build/global_power_gpu.x -size $m_size > ./step_1/global_s${m_size}.out
