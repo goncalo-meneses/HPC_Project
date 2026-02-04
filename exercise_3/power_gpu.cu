@@ -256,7 +256,11 @@ void RunCPUPowerMethod()
 // Host code
 int main(int argc, char** argv)
 {
-    struct timespec t_start,t_end;
+    double kernel_time = 0;
+    double memcpy_time = 0;
+    struct timespec t1, t2;
+
+    struct timespec t_start, t_end;
     double runtime;
     Arguments(argc, argv);
 		
@@ -297,8 +301,6 @@ int main(int argc, char** argv)
     // Initialize input matrix
     InitOne(h_VecV,N);
     
-    clock_gettime(CLOCK_REALTIME,&t_start);  // Here I start to count
-
     // Set the kernel arguments
     int threadsPerBlock = BlockSize;   
     int sharedMemSize = threadsPerBlock * threadsPerBlock * sizeof(float); // in per block, the memory is shared   
@@ -315,9 +317,11 @@ int main(int argc, char** argv)
     cudaMemcpy(d_MatA, h_MatA, mat_size, cudaMemcpyHostToDevice);
     cudaMemcpy(d_VecV, h_VecV, vec_size, cudaMemcpyHostToDevice);
 	// cutilCheckError(cutStopTimer(timer_mem));
-	
+
     //Power method loops
     printf("*************************************\n");
+
+    clock_gettime(CLOCK_REALTIME, &t_start);  // Here I start to count
 
     float oldLamda = 0;
     float lamda = 0;
@@ -333,11 +337,19 @@ int main(int argc, char** argv)
         FindNormW<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_VecW, d_NormW, N);
         cudaDeviceSynchronize();
 
+        clock_gettime(CLOCK_REALTIME, &t1);
         cudaMemcpy(h_NormW, d_NormW, norm_size, cudaMemcpyDeviceToHost);
+        clock_gettime(CLOCK_REALTIME, &t2);
+
+        memcpy_time += (t2.tv_sec - t1.tv_sec) + 1e-9 * (t2.tv_nsec - t1.tv_nsec);
 
         *h_NormW = sqrt(*h_NormW);
 
+        clock_gettime(CLOCK_REALTIME, &t1);
         cudaMemcpy(d_NormW, h_NormW, norm_size, cudaMemcpyHostToDevice);
+        clock_gettime(CLOCK_REALTIME, &t2);
+
+        memcpy_time += (t2.tv_sec - t1.tv_sec) + 1e-9 * (t2.tv_nsec - t1.tv_nsec);
 
         NormalizeW<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_VecV, d_VecW, d_NormW, N);
         cudaDeviceSynchronize();
@@ -348,7 +360,11 @@ int main(int argc, char** argv)
         ComputeLamda<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_VecV, d_VecW, d_Lamda, N);
         cudaDeviceSynchronize();
 
+        clock_gettime(CLOCK_REALTIME, &t1);
         cudaMemcpy(&lamda, d_Lamda, norm_size, cudaMemcpyDeviceToHost);
+        clock_gettime(CLOCK_REALTIME, &t2);
+
+        memcpy_time += (t2.tv_sec - t1.tv_sec) + 1e-9 * (t2.tv_nsec - t1.tv_nsec);
 
         printf("GPU lamda at %d: %f\n", i, lamda);
 
@@ -358,9 +374,11 @@ int main(int argc, char** argv)
     }
     printf("*************************************\n");
     
-    clock_gettime(CLOCK_REALTIME,&t_end);
+    clock_gettime(CLOCK_REALTIME, &t_end);
     runtime = (t_end.tv_sec - t_start.tv_sec) + 1e-9*(t_end.tv_nsec - t_start.tv_nsec);
-    printf("GPU: run time = %f secs.\n",runtime);
+    printf("GPU: Total runtime (including Memory copies) = %f secs.\n", runtime);
+    printf("GPU: Kernel runtime = %f secs.\n", runtime - memcpy_time);
+
     // printf("Overall CPU Execution Time: %f (ms) \n", cutGetTimerValue(timer_CPU));
 
     Cleanup();
