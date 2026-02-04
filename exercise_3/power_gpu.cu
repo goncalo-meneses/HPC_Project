@@ -322,6 +322,7 @@ int main(int argc, char** argv)
 
     float oldLamda = 0;
     float lamda = 0;
+    float h_Lamda;
 
     cudaMalloc((void**)&d_Lamda, sizeof(float));
 
@@ -330,7 +331,8 @@ int main(int argc, char** argv)
 
     for (int i=0; i < max_iteration; i++)
     {
-        h_NormW[0] = 0;
+        cudaMemset(d_NormW, 0, sizeof(float));
+        cudaMemset(d_Lamda, 0, sizeof(float));
 
         FindNormW<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_VecW, d_NormW, N);
         cudaDeviceSynchronize();
@@ -346,17 +348,13 @@ int main(int argc, char** argv)
 
         AvProduct<<<blocksPerGrid, threadsPerBlock>>>(d_MatA, d_VecV, d_VecW, N);
         cudaDeviceSynchronize();
-
-        h_NormW[0] = 0;
-
-        cudaMemcpy(d_Lamda, h_NormW, norm_size, cudaMemcpyHostToDevice);
     
         ComputeLamda<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_VecV, d_VecW, d_Lamda, N);
         cudaDeviceSynchronize();
 
-        cudaMemcpy(h_NormW, d_Lamda, norm_size, cudaMemcpyDeviceToHost);
+        cudaMemcpy(&h_Lamda, d_Lamda, sizeof(float), cudaMemcpyDeviceToHost);
 
-        lamda = h_NormW[0];
+        lamda = h_Lamda;
 
         printf("GPU lamda at %d: %f\n", i, lamda);
 
