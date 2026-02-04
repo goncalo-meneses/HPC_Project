@@ -25,9 +25,7 @@ float* h_VecW = NULL;
 float* d_VecW = NULL;
 float* h_NormW = NULL;
 float* d_NormW = NULL;
-
-// Output variables
-float* d_Lamda;
+float* d_Lamda = NULL;
 
 // Variables to change
 int GlobalSize = 5000;         // this is the dimension of the matrix, GlobalSize*GlobalSize
@@ -311,6 +309,7 @@ int main(int argc, char** argv)
     cudaMalloc((void**)&d_VecV, vec_size); 
     cudaMalloc((void**)&d_VecW, vec_size); // This vector is only used by the device
     cudaMalloc((void**)&d_NormW, norm_size); 
+    cudaMalloc((void**)&d_Lamda, norm_size);
 
     //Copy from host memory to device memory
     cudaMemcpy(d_MatA, h_MatA, mat_size, cudaMemcpyHostToDevice);
@@ -322,17 +321,14 @@ int main(int argc, char** argv)
 
     float oldLamda = 0;
     float lamda = 0;
-    float h_Lamda;
-
-    cudaMalloc((void**)&d_Lamda, sizeof(float));
 
     AvProduct<<<blocksPerGrid, threadsPerBlock>>>(d_MatA, d_VecV, d_VecW, N);
     cudaDeviceSynchronize();
 
     for (int i=0; i < max_iteration; i++)
     {
-        cudaMemset(d_NormW, 0, sizeof(float));
-        cudaMemset(d_Lamda, 0, sizeof(float));
+        cudaMemset(d_NormW, 0, norm_size);
+        cudaMemset(d_Lamda, 0, norm_size);
 
         FindNormW<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_VecW, d_NormW, N);
         cudaDeviceSynchronize();
@@ -352,9 +348,7 @@ int main(int argc, char** argv)
         ComputeLamda<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_VecV, d_VecW, d_Lamda, N);
         cudaDeviceSynchronize();
 
-        cudaMemcpy(&h_Lamda, d_Lamda, sizeof(float), cudaMemcpyDeviceToHost);
-
-        lamda = h_Lamda;
+        cudaMemcpy(&lamda, d_Lamda, norm_size, cudaMemcpyDeviceToHost);
 
         printf("GPU lamda at %d: %f\n", i, lamda);
 

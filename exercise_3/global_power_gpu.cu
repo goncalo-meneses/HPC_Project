@@ -10,9 +10,6 @@
 #include <time.h>
 #include "cuda.h"
 
-
-const int BLOCK_SIZE = 32;  // number of threads per block
-
 // Input Array Variables
 float* h_MatA = NULL;
 float* d_MatA = NULL;
@@ -24,9 +21,7 @@ float* h_VecW = NULL;
 float* d_VecW = NULL;
 float* h_NormW = NULL;
 float* d_NormW = NULL;
-
-// Output variables
-float* d_Lamda;
+float* d_Lamda = NULL;
 
 // Variables to change
 int GlobalSize = 5000;         // this is the dimension of the matrix, GlobalSize*GlobalSize
@@ -46,7 +41,7 @@ void checkCardVersion(void);
 // Kernels
 __global__ void AvProduct(float* g_MatA, float* g_VecV, float* g_VecW, int N);
 __global__ void FindNormW(float* g_VecW, float * g_NormW, int N);
-__global__ void NormalizeW(float* g_VecV,float* g_VecW, float norm, int N);             // also used by shared memory
+__global__ void NormalizeW(float* g_VecV,float* g_VecW, float* g_NormW, int N);
 __global__ void ComputeLamda( float* g_VecV,float* g_VecW, float * g_Lamda, int N);
 
 
@@ -68,22 +63,22 @@ void CPU_AvProduct()
 __global__ void AvProduct(float* g_MatA, float* g_VecV, float* g_VecW, int N)
 {
     int matIndex = 0;
-    int workIndex = threadIdx.x + blockIdx.x * blockDim.x;
+    int g_idx = threadIdx.x + blockIdx.x * blockDim.x;
 
-    if (workIndex < N)
+    if (g_idx < N)
     {
-        g_VecW[workIndex] = 0;
+        g_VecW[g_idx] = 0;
         for (int j=0; j < N; j++)
         {
-            matIndex = workIndex * N + j;
-            g_VecW[workIndex] += g_MatA[matIndex] * g_VecV[j];
+            matIndex = g_idx * N + j;
+            g_VecW[g_idx] += g_MatA[matIndex] * g_VecV[j];
         }
     }
 }
 
 __global__ void FindNormW(float* g_VecW, float * g_NormW, int N)
 {
-    unsigned int g_idx = threadIdx.x + blockDim.x * blockIdx.x;
+    int g_idx = threadIdx.x + blockDim.x * blockIdx.x;
 
     if (g_idx < N)
         atomicAdd(g_NormW, g_VecW[g_idx] * g_VecW[g_idx]);
@@ -91,18 +86,18 @@ __global__ void FindNormW(float* g_VecW, float * g_NormW, int N)
 
 __global__ void ComputeLamda( float* g_VecV,float* g_VecW, float * g_Lamda, int N)
 {
-    unsigned int g_idx = threadIdx.x + blockDim.x * blockIdx.x;
+    int g_idx = threadIdx.x + blockDim.x * blockIdx.x;
 
     if (g_idx < N)
         atomicAdd(g_Lamda, g_VecV[g_idx] * g_VecW[g_idx]);
 }
 
-__global__ void NormalizeW(float* g_VecV,float* g_VecW, float norm, int N)
+__global__ void NormalizeW(float* g_VecV,float* g_VecW, float* g_NormW, int N)
 {
     int g_idx = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (g_idx < N)
-        g_VecV[g_idx] = g_VecW[g_idx] / norm;
+        g_VecV[g_idx] = g_VecW[g_idx] / g_NormW[0];
 }
 
 void CPU_NormalizeW()
@@ -201,55 +196,53 @@ int main(int argc, char** argv)
 
     // Set the kernel arguments
     int threadsPerBlock = BlockSize;   
-    int sharedMemSize = threadsPerBlock * threadsPerBlock * sizeof(float); // in per block, the memory is shared   
     int blocksPerGrid = (N + threadsPerBlock - 1) / threadsPerBlock;
 
     // Allocate matrix and vectors in device memory
     cudaMalloc((void**)&d_MatA, mat_size); 
     cudaMalloc((void**)&d_VecV, vec_size); 
     cudaMalloc((void**)&d_VecW, vec_size); // This vector is only used by the device
-    cudaMalloc((void**)&d_NormW, norm_size); 
+    cudaMalloc((void**)&d_NormW, norm_size);
+    cudaMalloc((void**)&d_Lamda, norm_size);
 
     //Copy from host memory to device memory
     cudaMemcpy(d_MatA, h_MatA, mat_size, cudaMemcpyHostToDevice);
     cudaMemcpy(d_VecV, h_VecV, vec_size, cudaMemcpyHostToDevice);
 	// cutilCheckError(cutStopTimer(timer_mem));
 	
-    //Power method loops
+    // GPU Power method loop
     printf("*************************************\n");
 
     float oldLamda = 0;
     float lamda = 0;
-    float h_Lamda;
 
-    cudaMalloc((void**)&d_Lamda, sizeof(float));
-
-    AvProduct<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_MatA, d_VecV, d_VecW, N);
+    AvProduct<<<blocksPerGrid, threadsPerBlock>>>(d_MatA, d_VecV, d_VecW, N);
     cudaDeviceSynchronize();
 
     for (int i=0; i < max_iteration; i++)
     {
-        cudaMemset(d_NormW, 0, sizeof(float));
-        cudaMemset(d_Lamda, 0, sizeof(float));
+        cudaMemset(d_NormW, 0, norm_size);
+        cudaMemset(d_Lamda, 0, norm_size);
 
-        FindNormW<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_VecW, d_NormW, N);
+        FindNormW<<<blocksPerGrid, threadsPerBlock>>>(d_VecW, d_NormW, N);
         cudaDeviceSynchronize();
 
         cudaMemcpy(h_NormW, d_NormW, norm_size, cudaMemcpyDeviceToHost);
-        float norm = sqrt(*h_NormW);
 
-        NormalizeW<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_VecV, d_VecW, norm, N);
+        *h_NormW = sqrt(*h_NormW);
+
+        cudaMemcpy(d_NormW, h_NormW, norm_size, cudaMemcpyHostToDevice);
+
+        NormalizeW<<<blocksPerGrid, threadsPerBlock>>>(d_VecV, d_VecW, d_NormW, N);
         cudaDeviceSynchronize();
 
-        AvProduct<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_MatA, d_VecV, d_VecW, N);
+        AvProduct<<<blocksPerGrid, threadsPerBlock>>>(d_MatA, d_VecV, d_VecW, N);
         cudaDeviceSynchronize();
     
-        ComputeLamda<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_VecV, d_VecW, d_Lamda, N);
+        ComputeLamda<<<blocksPerGrid, threadsPerBlock>>>(d_VecV, d_VecW, d_Lamda, N);
         cudaDeviceSynchronize();
 
-        cudaMemcpy(&h_Lamda, d_Lamda, sizeof(float), cudaMemcpyDeviceToHost);
-
-        lamda = h_Lamda;
+        cudaMemcpy(&lamda, d_Lamda, norm_size, cudaMemcpyDeviceToHost);
 
         printf("GPU lamda at %d: %f\n", i, lamda);
 
