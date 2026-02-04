@@ -47,7 +47,7 @@ void checkCardVersion(void);
 // Kernels
 __global__ void AvProduct(float* g_MatA, float* g_VecV, float* g_VecW, int N);
 __global__ void FindNormW(float* g_VecW, float * g_NormW, int N);
-__global__ void NormalizeW(float* g_VecV,float* g_VecW, float norm, int N);
+__global__ void NormalizeW(float* g_VecV,float* g_VecW, float* g_NormW, int N);
 __global__ void ComputeLamda( float* g_VecV,float* g_VecW, float * g_Lamda, int N);
 
 
@@ -153,12 +153,18 @@ __global__ void FindNormW(float* g_VecW, float * g_NormW, int N)
     }
 }
 
-__global__ void NormalizeW(float* g_VecV,float* g_VecW, float norm, int N)
+__global__ void NormalizeW(float* g_VecV,float* g_VecW, float* g_NormW, int N)
 {
+    extern __shared__ float s_data[];
+
+    int t_idx = threadIdx.x;
     int g_idx = blockIdx.x * blockDim.x + threadIdx.x;
 
+    if (t_idx == 0)
+        s_data[0] = g_NormW[0];
+
     if (g_idx < N)
-        g_VecV[g_idx] = g_VecW[g_idx] / norm;
+        g_VecV[g_idx] = g_VecW[g_idx] / g_NormW[0];
 }
 
 __global__ void ComputeLamda(float* g_VecV,float* g_VecW, float* g_Lamda, int N)
@@ -322,14 +328,6 @@ int main(int argc, char** argv)
 
     AvProduct<<<blocksPerGrid, threadsPerBlock>>>(d_MatA, d_VecV, d_VecW, N);
     cudaDeviceSynchronize();
-    
-    // =============
-    //   Debugging
-    // =============
-    // cudaError_t err = cudaGetLastError();
-    // if (err != cudaSuccess) {
-    //     printf("AvProduct error: %s\n", cudaGetErrorString(err));
-    // }
 
     for (int i=0; i < max_iteration; i++)
     {
@@ -338,33 +336,21 @@ int main(int argc, char** argv)
 
         FindNormW<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_VecW, d_NormW, N);
         cudaDeviceSynchronize();
-        // if (err != cudaSuccess) {
-        //     printf("AvProduct error: %s\n", cudaGetErrorString(err));
-        // }
 
         cudaMemcpy(h_NormW, d_NormW, norm_size, cudaMemcpyDeviceToHost);
-        // printf("DEBUG: h_NormW = %f\n", *h_NormW);
 
-        float norm = sqrt(*h_NormW);
-        // printf("DEBUG: norm = %f\n", norm);
+        *h_NormW = sqrt(*h_NormW);
 
-        NormalizeW<<<blocksPerGrid, threadsPerBlock>>>(d_VecV, d_VecW, norm, N);
+        cudaMemcpy(d_NormW, h_NormW, norm_size, cudaMemcpyHostToDevice);
+
+        NormalizeW<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_VecV, d_VecW, d_NormW, N);
         cudaDeviceSynchronize();
-        // if (err != cudaSuccess) {
-        //     printf("AvProduct error: %s\n", cudaGetErrorString(err));
-        // }
 
         AvProduct<<<blocksPerGrid, threadsPerBlock>>>(d_MatA, d_VecV, d_VecW, N);
         cudaDeviceSynchronize();
-        // if (err != cudaSuccess) {
-        //     printf("AvProduct error: %s\n", cudaGetErrorString(err));
-        // }
     
         ComputeLamda<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_VecV, d_VecW, d_Lamda, N);
         cudaDeviceSynchronize();
-        // if (err != cudaSuccess) {
-        //     printf("AvProduct error: %s\n", cudaGetErrorString(err));
-        // }
 
         cudaMemcpy(&h_Lamda, d_Lamda, sizeof(float), cudaMemcpyDeviceToHost);
 
