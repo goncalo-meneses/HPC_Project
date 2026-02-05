@@ -160,9 +160,10 @@ __global__ void NormalizeW(float* g_VecV,float* g_VecW, float* g_NormW, int N)
 
     if (t_idx == 0)
         s_data[0] = g_NormW[0];
+    __syncthreads();
 
     if (g_idx < N)
-        g_VecV[g_idx] = g_VecW[g_idx] / g_NormW[0];
+        g_VecV[g_idx] = g_VecW[g_idx] / s_data[0];
 }
 
 __global__ void ComputeLamda(float* g_VecV,float* g_VecW, float* g_Lamda, int N)
