@@ -257,6 +257,8 @@ void RunCPUPowerMethod()
 int main(int argc, char** argv)
 {
     double memcpy_time = 0;
+    double memset_time = 0;
+    double memalloc_time = 0;
     struct timespec t1, t2;
 
     struct timespec t_start, t_end;
@@ -308,15 +310,24 @@ int main(int argc, char** argv)
     int blocksPerGrid = (N + threadsPerBlock - 1) / threadsPerBlock;
 
     // Allocate matrix and vectors in device memory
+    clock_gettime(CLOCK_REALTIME, &t1);
     cudaMalloc((void**)&d_MatA, mat_size); 
     cudaMalloc((void**)&d_VecV, vec_size); 
     cudaMalloc((void**)&d_VecW, vec_size); // This vector is only used by the device
     cudaMalloc((void**)&d_NormW, norm_size); 
     cudaMalloc((void**)&d_Lamda, norm_size);
+    clock_gettime(CLOCK_REALTIME, &t2);
+
+    memalloc_time += (t2.tv_sec - t1.tv_sec) + 1e-9 * (t2.tv_nsec - t1.tv_nsec);
 
     //Copy from host memory to device memory
+    clock_gettime(CLOCK_REALTIME, &t1);
     cudaMemcpy(d_MatA, h_MatA, mat_size, cudaMemcpyHostToDevice);
     cudaMemcpy(d_VecV, h_VecV, vec_size, cudaMemcpyHostToDevice);
+    clock_gettime(CLOCK_REALTIME, &t2);
+
+    memcpy_time += (t2.tv_sec - t1.tv_sec) + 1e-9 * (t2.tv_nsec - t1.tv_nsec);
+
 	// cutilCheckError(cutStopTimer(timer_mem));
 
     //Power method loops
@@ -331,8 +342,12 @@ int main(int argc, char** argv)
 
     for (int i=0; i < max_iteration; i++)
     {
+        clock_gettime(CLOCK_REALTIME, &t1);
         cudaMemset(d_NormW, 0, norm_size);
         cudaMemset(d_Lamda, 0, norm_size);
+        clock_gettime(CLOCK_REALTIME, &t2);
+
+        memset_time += (t2.tv_sec - t1.tv_sec) + 1e-9 * (t2.tv_nsec - t1.tv_nsec);
 
         FindNormW<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_VecW, d_NormW, N);
         cudaDeviceSynchronize();
@@ -377,8 +392,10 @@ int main(int argc, char** argv)
     clock_gettime(CLOCK_REALTIME, &t_end);
     runtime = (t_end.tv_sec - t_start.tv_sec) + 1e-9*(t_end.tv_nsec - t_start.tv_nsec);
     printf("GPU: Total runtime (including Memory copies) = %f secs.\n", runtime);
-    printf("GPU: Kernel runtime = %f secs.\n", runtime - memcpy_time);
-
+    printf("GPU: Kernel runtime = %f secs.\n", runtime - memcpy_time - memset_time - memalloc_time);
+    printf("GPU: Memcpy runtime = %f secs.\n", memcpy_time);
+    printf("GPU: Memset runtime = %f secs.\n", memset_time);
+    printf("GPU: Memalloc runtime = %f secs.\n", memalloc_time);
     // printf("Overall CPU Execution Time: %f (ms) \n", cutGetTimerValue(timer_CPU));
 
     Cleanup();
