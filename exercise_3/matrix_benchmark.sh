@@ -12,6 +12,8 @@ module load openmpi
 module load slurm
 module load cuda
 
+mkdir -p step_2
+
 for m_size in 50 500 2000 4000
 do
     for block_size in 32 64 100
