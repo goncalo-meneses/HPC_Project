@@ -399,7 +399,7 @@ int main(int argc, char** argv)
     printf("GPU: Memcpy runtime = %f secs.\n", memcpy_time);
     printf("GPU: Memset runtime = %f secs.\n", memset_time);
     printf("GPU: Memalloc runtime = %f secs.\n", memalloc_time);
-    printf("GPU: Speedup (incl. Memory copies) = %f.\n", cpu_runtime / runtime);
+    printf("GPU: Speedup (incl. Memory copies) = %f.\n", cpu_runtime / (runtime - memalloc_time));
     printf("GPU: Speedup (excl. Memory copies) = %f.\n", cpu_runtime / (kernel_runtime + memset_time));     // Memset time is negligible
     // printf("Overall CPU Execution Time: %f (ms) \n", cutGetTimerValue(timer_CPU));
 
