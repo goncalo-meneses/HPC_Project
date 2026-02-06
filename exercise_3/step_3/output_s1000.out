@@ -1,0 +1,33 @@
+Matrix size 1000 X 1000 
+Power method in CPU starts
+*************************************
+CPU lamda at 0: 36770.246094 
+CPU lamda at 1: 49973.398438 
+CPU lamda at 2: 49980.085938 
+CPU lamda at 3: 49980.054688 
+CPU lamda at 4: 49980.054688 
+*************************************
+CPU: run time = 0.012141 secs.
+CPU: malloc time = 0.000005 secs.
+Power method in CPU is finished
+
+Power method in GPU starts
+This GPU has major architecture 8, minor 0 
+*************************************
+GPU lamda at 0: 36770.250000
+GPU lamda at 1: 49973.378906
+GPU lamda at 2: 49980.078125
+GPU lamda at 3: 49980.109375
+GPU lamda at 4: 49980.097656
+GPU lamda at 5: 49980.093750
+GPU lamda at 6: 49980.089844
+GPU lamda at 7: 49980.097656
+GPU lamda at 8: 49980.097656
+*************************************
+GPU: Total runtime (incl. Memory copies) = 0.082602 secs.
+GPU: Kernel runtime = 0.082051 secs.
+GPU: Memcpy runtime = 0.000551 secs.
+GPU: Memset runtime = 0.000022 secs.
+GPU: Memalloc runtime = 0.080888 secs.
+GPU: Speedup (incl. Memory copies) = 0.146985.
+GPU: Speedup (excl. Memory copies) = 0.147972.

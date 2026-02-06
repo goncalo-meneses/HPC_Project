@@ -298,7 +298,7 @@ int main(int argc, char** argv)
     clock_gettime(CLOCK_REALTIME,&t_end);
     cpu_runtime = (t_end.tv_sec - t_start.tv_sec) + 1e-9*(t_end.tv_nsec - t_start.tv_nsec);
     printf("CPU: run time = %f secs.\n", cpu_runtime);
-    printf("CPU: malloc time = %f secs.\n", cpu_malloc_time);
+    // printf("CPU: malloc time = %f secs.\n", cpu_malloc_time);
     printf("Power method in CPU is finished\n");
     
     
@@ -401,12 +401,12 @@ int main(int argc, char** argv)
     runtime = (t_end.tv_sec - t_start.tv_sec) + 1e-9*(t_end.tv_nsec - t_start.tv_nsec);
     double kernel_runtime = runtime - memcpy_time;
     printf("GPU: Total runtime (incl. Memory copies) = %f secs.\n", runtime);
-    printf("GPU: Kernel runtime = %f secs.\n", kernel_runtime);
-    printf("GPU: Memcpy runtime = %f secs.\n", memcpy_time);
-    printf("GPU: Memset runtime = %f secs.\n", memset_time);
-    printf("GPU: Memalloc runtime = %f secs.\n", memalloc_time);
+    // printf("GPU: Kernel runtime = %f secs.\n", kernel_runtime);
+    // printf("GPU: Memcpy runtime = %f secs.\n", memcpy_time);
+    // printf("GPU: Memset runtime = %f secs.\n", memset_time);
+    // printf("GPU: Memalloc runtime = %f secs.\n", memalloc_time);
     printf("GPU: Speedup (incl. Memory copies) = %f.\n", cpu_runtime / runtime);
-    printf("GPU: Speedup (excl. Memory copies) = %f.\n", cpu_runtime / kernel_runtime);     // Memset time is negligible
+    printf("GPU: Speedup (excl. Memory copies) = %f.\n", cpu_runtime / kernel_runtime);
     // printf("Overall CPU Execution Time: %f (ms) \n", cutGetTimerValue(timer_CPU));
 
     Cleanup();

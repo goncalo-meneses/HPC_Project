@@ -1,0 +1,60 @@
+Matrix size 10000 X 10000 
+Power method in CPU starts
+*************************************
+CPU lamda at 0: 371278.343750 
+CPU lamda at 1: 499970.656250 
+CPU lamda at 2: 499975.468750 
+CPU lamda at 3: 499974.593750 
+CPU lamda at 4: 499974.687500 
+CPU lamda at 5: 499974.750000 
+CPU lamda at 6: 499974.812500 
+CPU lamda at 7: 499974.718750 
+CPU lamda at 8: 499974.718750 
+*************************************
+CPU: run time = 2.012590 secs.
+Power method in CPU is finished
+
+Power method in GPU starts
+This GPU has major architecture 8, minor 0 
+*************************************
+GPU lamda at 0: 371277.750000
+GPU lamda at 1: 499970.937500
+GPU lamda at 2: 499975.875000
+GPU lamda at 3: 499976.906250
+GPU lamda at 4: 499976.062500
+GPU lamda at 5: 499976.250000
+GPU lamda at 6: 499976.562500
+GPU lamda at 7: 499976.000000
+GPU lamda at 8: 499976.250000
+GPU lamda at 9: 499976.562500
+GPU lamda at 10: 499976.625000
+GPU lamda at 11: 499976.843750
+GPU lamda at 12: 499976.531250
+GPU lamda at 13: 499976.468750
+GPU lamda at 14: 499976.531250
+GPU lamda at 15: 499976.125000
+GPU lamda at 16: 499976.750000
+GPU lamda at 17: 499976.250000
+GPU lamda at 18: 499976.687500
+GPU lamda at 19: 499976.593750
+GPU lamda at 20: 499975.875000
+GPU lamda at 21: 499976.437500
+GPU lamda at 22: 499976.843750
+GPU lamda at 23: 499976.125000
+GPU lamda at 24: 499976.500000
+GPU lamda at 25: 499976.250000
+GPU lamda at 26: 499976.906250
+GPU lamda at 27: 499976.093750
+GPU lamda at 28: 499976.375000
+GPU lamda at 29: 499976.625000
+GPU lamda at 30: 499976.375000
+GPU lamda at 31: 499976.625000
+GPU lamda at 32: 499976.093750
+GPU lamda at 33: 499976.218750
+GPU lamda at 34: 499976.406250
+GPU lamda at 35: 499976.562500
+GPU lamda at 36: 499976.625000
+GPU lamda at 37: 499976.031250
+GPU lamda at 38: 499976.031250
+*************************************
+GPU: run time = 0.320185 secs.
