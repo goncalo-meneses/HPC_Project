@@ -16,5 +16,5 @@ mkdir -p step_3
 
 for m_size in 500 1000 2000 4000 6000 8000 10000
 do
-    srun build/power_gpu_32.x -size $m_size > ./speedup_results/output_s${m_size}.out
+    srun build/power_gpu_32.x -size $m_size > ./step_3/output_s${m_size}.out
 done
