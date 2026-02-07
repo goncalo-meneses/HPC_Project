@@ -14,8 +14,6 @@ mkdir -p ./4_5
 
 > ./4_5/results_p4_sizes.log
 
-# Experiment 1: Fixed P=4, varying problem size
-# Small sizes to find where comm ≈ comp
 for config in "1 4" "2 2"; do
 	for size in 10 15 20 30 50 75 100; do
 		echo "===Config: $config, Size: ${size}x${size} ===" >> ./4_5/results_p4_sizes.log
