@@ -1,0 +1,72 @@
+#!/bin/sh
+#SBATCH --job-name=exp_vary_p
+#SBATCH --partition=compute-p1
+#SBATCH --account=Education-EEMCS-Courses-WI4049TU
+#SBATCH --time=00:05:00
+#SBATCH --ntasks=36
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=1GB
+module load 2025
+module load openmpi
+module load slurm
+
+> results_vary_p.log
+
+# Experiment 2: Fixed problem size, varying P
+# Test stripe-wise (1xP) and block-wise (sqrt(P)xsqrt(P))
+for size in 100 200 400; do
+	# P=4
+	for config in "1 4" "2 2"; do
+		px=$(echo $config | cut -d' ' -f1)
+		py=$(echo $config | cut -d' ' -f2)
+		P=$((px * py))
+		echo "===Config: $config, Size: ${size}x${size}, P=$P ===" >> results_vary_p.log
+		./GridDist $config $size $size
+		srun --ntasks=$P MPI_Fempois >> results_vary_p.log
+		echo "" >> results_vary_p.log
+	done
+
+	# P=9
+	for config in "1 9" "3 3"; do
+		px=$(echo $config | cut -d' ' -f1)
+		py=$(echo $config | cut -d' ' -f2)
+		P=$((px * py))
+		echo "===Config: $config, Size: ${size}x${size}, P=$P ===" >> results_vary_p.log
+		./GridDist $config $size $size
+		srun --ntasks=$P MPI_Fempois >> results_vary_p.log
+		echo "" >> results_vary_p.log
+	done
+
+	# P=16
+	for config in "1 16" "4 4"; do
+		px=$(echo $config | cut -d' ' -f1)
+		py=$(echo $config | cut -d' ' -f2)
+		P=$((px * py))
+		echo "===Config: $config, Size: ${size}x${size}, P=$P ===" >> results_vary_p.log
+		./GridDist $config $size $size
+		srun --ntasks=$P MPI_Fempois >> results_vary_p.log
+		echo "" >> results_vary_p.log
+	done
+
+	# P=25
+	for config in "1 25" "5 5"; do
+		px=$(echo $config | cut -d' ' -f1)
+		py=$(echo $config | cut -d' ' -f2)
+		P=$((px * py))
+		echo "===Config: $config, Size: ${size}x${size}, P=$P ===" >> results_vary_p.log
+		./GridDist $config $size $size
+		srun --ntasks=$P MPI_Fempois >> results_vary_p.log
+		echo "" >> results_vary_p.log
+	done
+
+	# P=36
+	for config in "1 36" "6 6"; do
+		px=$(echo $config | cut -d' ' -f1)
+		py=$(echo $config | cut -d' ' -f2)
+		P=$((px * py))
+		echo "===Config: $config, Size: ${size}x${size}, P=$P ===" >> results_vary_p.log
+		./GridDist $config $size $size
+		srun --ntasks=$P MPI_Fempois >> results_vary_p.log
+		echo "" >> results_vary_p.log
+	done
+done

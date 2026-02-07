@@ -1,0 +1,24 @@
+#!/bin/sh
+#SBATCH --job-name=exp_p4_sizes
+#SBATCH --partition=compute-p1
+#SBATCH --account=Education-EEMCS-Courses-WI4049TU
+#SBATCH --time=00:02:00
+#SBATCH --ntasks=4
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=1GB
+module load 2025
+module load openmpi
+module load slurm
+
+> ./4_5/results_p4_sizes.log
+
+# Experiment 1: Fixed P=4, varying problem size
+# Small sizes to find where comm ≈ comp
+for config in "1 4" "2 2"; do
+	for size in 10 15 20 30 50 75; do
+		echo "===Config: $config, Size: ${size}x${size} ===" >> ./4_5/results_p4_sizes.log
+		./GridDist $config $size $size
+		srun MPI_Fempois >> ./4_5/results_p4_sizes.log
+		echo "" >> ./4_5/results_p4_sizes.log
+	done
+done
