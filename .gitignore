@@ -1,3 +1,4 @@
 *.x
 slurm-*.out
 crossover_analysis.py
+*.dat
