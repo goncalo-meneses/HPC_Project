@@ -39,8 +39,6 @@ int main(int argc, char **argv)
         MPI_Abort(MPI_COMM_WORLD, 1);
     }
 
-    /// for (int trial = 0; trial < NUM_TRIALS; trial++){
-    // Loop over every message size in powers of 2
     for (int n=1; n<=MAX_ARRAY_SIZE; n*=4) {
         
         numberOfElementsToSend = n;
@@ -88,7 +86,6 @@ int main(int argc, char **argv)
             } // end of for-loop
         }
     } // end of for-loop
-//}
 
     // Finalize MPI
     MPI_Finalize();
