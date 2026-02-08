@@ -4,7 +4,6 @@
 
 // Maximum array size 2^20= 1048576 elements
 #define MAX_ARRAY_SIZE (1<<20)
-#define NUM_TRIALS 10
 
 int main(int argc, char **argv)
 {
@@ -30,7 +29,9 @@ int main(int argc, char **argv)
 
     int numberOfElementsToSend;
     int numberOfElementsReceived;
-    double startTime, endTime;
+
+    double startTime;
+    double endTime;
 
     // PART C
     if (numProcs < 2)
@@ -39,31 +40,35 @@ int main(int argc, char **argv)
         MPI_Abort(MPI_COMM_WORLD, 1);
     }
 
-    for (int n=1; n<=MAX_ARRAY_SIZE; n*=4) {
-        
+    for (int n=1; n<=MAX_ARRAY_SIZE; n*=4)
+    {
         numberOfElementsToSend = n;
 
         if (myRank == 0)
         {
-            printf("Rank %2.1i: Sending %i elements\n", myRank, numberOfElementsToSend);
+            printf("Rank %2.1i: Sending %i elements\n",
+                myRank, numberOfElementsToSend);
 
             myArray[0]=myArray[1]+1; // activate in cache (avoids possible delay when sending the 1st element)
 
-            startTime = MPI_Wtime();
-            for (i=0; i<5; i++)
-            {
-                MPI_Send(myArray, numberOfElementsToSend, MPI_INT, 1, 0, MPI_COMM_WORLD);
 
+            startTime = MPI_Wtime();
+            for (i=0; i<5; i++) 
+            {
+                MPI_Send(myArray, numberOfElementsToSend, MPI_INT, 1, 0,
+                    MPI_COMM_WORLD);
                 // Probe message in order to obtain the amount of data
-                MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+    /*          MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
                 MPI_Get_count(&status, MPI_INT, &numberOfElementsReceived);
-                
-                MPI_Recv(myArray, numberOfElementsReceived, MPI_INT, 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    */
+                MPI_Recv(myArray, numberOfElementsReceived, MPI_INT, 1, 0,
+                    MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             } // end of for-loop
 
             endTime = MPI_Wtime();
 
-            printf("Rank %2.1i: Received %i elements\n", myRank, numberOfElementsReceived);
+            printf("Rank %2.1i: Received %i elements\n",
+                myRank, numberOfElementsReceived);
 
             // average communication time of 1 send-receive (total 5*2 times)
             printf("Ping Pong took %f seconds\n", (endTime - startTime)/10);
@@ -73,19 +78,24 @@ int main(int argc, char **argv)
             // Probe message in order to obtain the amount of data
             MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
             MPI_Get_count(&status, MPI_INT, &numberOfElementsReceived);
-           
+    
             for (i=0; i<5; i++)
             {
-                MPI_Recv(myArray, numberOfElementsReceived, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                MPI_Recv(myArray, numberOfElementsReceived, MPI_INT, 0, 0,
+                MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-                // printf("Rank %2.1i: Received %i elements\n", myRank, numberOfElementsReceived);
+            printf("Rank %2.1i: Received %i elements\n",
+                myRank, numberOfElementsReceived);
 
-                // printf("Rank %2.1i: Sending back %i elements\n", myRank, numberOfElementsToSend);
+            printf("Rank %2.1i: Sending back %i elements\n",
+                myRank, numberOfElementsToSend);
+    
 
-                MPI_Send(myArray, numberOfElementsToSend, MPI_INT, 0, 0, MPI_COMM_WORLD);
+                MPI_Send(myArray, numberOfElementsToSend, MPI_INT, 0, 0,
+                MPI_COMM_WORLD);
             } // end of for-loop
         }
-    } // end of for-loop
+    }
 
     // Finalize MPI
     MPI_Finalize();
