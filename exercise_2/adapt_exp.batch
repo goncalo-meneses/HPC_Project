@@ -1,0 +1,22 @@
+#!/bin/sh
+#SBATCH --job-name=poisson_solver
+#SBATCH --partition=compute-p1
+#SBATCH --account=Education-EEMCS-Courses-WI4049TU
+#SBATCH --time=00:03:00
+#SBATCH --ntasks=4
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=1GB
+module load 2025
+module load openmpi
+module load slurm
+
+mkdir -p ./4_6
+
+> ./4_6/results.log
+
+for size in 100 200 400 800; do
+    echo "===Config: 2 2, Size: ${size}x${size} ===" >> ./4_6/results.log
+    ./GridDist 2 2 $size $size
+    srun MPI_Fempois adapt >> ./4_6/results.log
+    echo "" >> ./4_6/results.log
+done
