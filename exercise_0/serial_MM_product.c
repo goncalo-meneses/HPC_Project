@@ -12,15 +12,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
-// #define NRA 1000                 /* number of rows in matrix A */
-// #define NCA 1000                 /* number of columns in matrix A */
-// #define NCB 1000                  /* number of columns in matrix B */
-#define N 1000
-
-int main (int argc, char *argv[]) 
+int main (int argc, char *argv[])
 {
-int     tid, nthreads, i, j, k;
+int     i, j, k;
+int N = 1000;
+if (argc > 1) N = atoi(argv[1]);
 /* for simplicity, set NRA=NCA=NCB=N  */
 int NRA=N;
 int NCA=N;
@@ -45,23 +43,21 @@ double  a[NRA][NCA],           /* matrix A to be multiplied */
     for (j=0; j<NCB; j++)
       c[i][j]= 0;
 
-  /* Parallelize the computation of the following matrix-matrix multiplication. 
-     How to partition and distribute the initial matrices, the work, and collecting
-     final results.
-  */
-  
-  for (i=0; i<NRA; i++)    
+  struct timespec t0, t1;
+  clock_gettime(CLOCK_MONOTONIC, &t0);
+
+  for (i=0; i<NRA; i++)
     {
-    for(j=0; j<NCB; j++)       
+    for(j=0; j<NCB; j++)
       for (k=0; k<NCA; k++)
         c[i][j] += a[i][k] * b[k][j];
-    }  
+    }
 
-/*  perform time measurement. Always check the correctness of the parallel results
-    by printing a few values of c[i][j] and compare with the sequential output.
-*/
+  clock_gettime(CLOCK_MONOTONIC, &t1);
+  double elapsed = (t1.tv_sec - t0.tv_sec) + (t1.tv_nsec - t0.tv_nsec) / 1e9;
+  printf("N=%d, time=%f seconds\n", N, elapsed);
 
-    return 0; 
+  return 0;
 }
 
 

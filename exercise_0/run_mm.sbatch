@@ -12,6 +12,9 @@
 module load 2025 openmpi slurm
 
 for N in 200 400 800 1000; do
+  echo "=== Serial N=$N ==="
+  srun -n 1 serial_MM_product $N
+  echo
   for p in 1 2 8 24 48 64; do
     if [ $p -le $SLURM_NTASKS ]; then
       echo "=== N=$N, p=$p ==="
