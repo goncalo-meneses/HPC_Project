@@ -9,20 +9,23 @@ CPU lamda at 4: 100018.367188
 CPU lamda at 5: 100018.351562 
 CPU lamda at 6: 100018.351562 
 *************************************
-CPU: run time = 0.063712 secs.
+CPU: run time = 0.063770 secs.
 Power method in CPU is finished
 
 Power method in GPU starts
 This GPU has major architecture 8, minor 0 
 *************************************
-GPU lamda at 0: 74132.226562
-GPU lamda at 1: 100011.960938
+GPU lamda at 0: 74132.234375
+GPU lamda at 1: 100011.953125
 GPU lamda at 2: 100018.304688
 GPU lamda at 3: 100018.281250
-GPU lamda at 4: 100018.304688
+GPU lamda at 4: 100018.296875
 GPU lamda at 5: 100018.289062
-GPU lamda at 6: 100018.304688
-GPU lamda at 7: 100018.296875
-GPU lamda at 8: 100018.296875
+GPU lamda at 6: 100018.312500
+GPU lamda at 7: 100018.304688
+GPU lamda at 8: 100018.289062
+GPU lamda at 9: 100018.296875
+GPU lamda at 10: 100018.304688
+GPU lamda at 11: 100018.304688
 *************************************
-GPU: Total runtime (incl. Memory copies) = 0.081755 secs.
+GPU: Total runtime (incl. Memory copies) = 0.088201 secs.
