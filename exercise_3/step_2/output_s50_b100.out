@@ -23,4 +23,4 @@ GPU lamda at 3: 2505.770508
 GPU lamda at 4: 2505.772217
 GPU lamda at 5: 2505.772217
 *************************************
-GPU: Total runtime (incl. Memory copies) = 0.132071 secs.
+GPU: Total runtime (incl. Memory copies) = 0.097704 secs.

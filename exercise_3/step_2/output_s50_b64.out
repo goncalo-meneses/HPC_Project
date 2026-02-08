@@ -10,7 +10,7 @@ CPU lamda at 5: 2505.772705
 CPU lamda at 6: 2505.771729 
 CPU lamda at 7: 2505.771729 
 *************************************
-CPU: run time = 0.000065 secs.
+CPU: run time = 0.000063 secs.
 Power method in CPU is finished
 
 Power method in GPU starts
@@ -23,4 +23,4 @@ GPU lamda at 3: 2505.770508
 GPU lamda at 4: 2505.771973
 GPU lamda at 5: 2505.771973
 *************************************
-GPU: Total runtime (incl. Memory copies) = 0.107023 secs.
+GPU: Total runtime (incl. Memory copies) = 0.090867 secs.
