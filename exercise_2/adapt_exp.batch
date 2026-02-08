@@ -16,7 +16,7 @@ mkdir -p ./4_6
 
 for size in 100 200 400 800; do
     echo "===Config: 2 2, Size: ${size}x${size} ===" >> ./4_6/results.log
-    ./GridDist 2 2 $size $size
-    srun MPI_Fempois adapt >> ./4_6/results.log
+    ./GridDist 2 2 $size $size adapt
+    srun MPI_Fempois >> ./4_6/results.log
     echo "" >> ./4_6/results.log
 done
