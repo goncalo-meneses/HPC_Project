@@ -58,9 +58,9 @@ int main(int argc, char **argv)
                 MPI_Send(myArray, numberOfElementsToSend, MPI_INT, 1, 0,
                     MPI_COMM_WORLD);
                 // Probe message in order to obtain the amount of data
-    /*          MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+                MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
                 MPI_Get_count(&status, MPI_INT, &numberOfElementsReceived);
-    */
+
                 MPI_Recv(myArray, numberOfElementsReceived, MPI_INT, 1, 0,
                     MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             } // end of for-loop
@@ -84,11 +84,11 @@ int main(int argc, char **argv)
                 MPI_Recv(myArray, numberOfElementsReceived, MPI_INT, 0, 0,
                 MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-            printf("Rank %2.1i: Received %i elements\n",
-                myRank, numberOfElementsReceived);
+            // printf("Rank %2.1i: Received %i elements\n",
+            //     myRank, numberOfElementsReceived);
 
-            printf("Rank %2.1i: Sending back %i elements\n",
-                myRank, numberOfElementsToSend);
+            // printf("Rank %2.1i: Sending back %i elements\n",
+            //     myRank, numberOfElementsToSend);
     
 
                 MPI_Send(myArray, numberOfElementsToSend, MPI_INT, 0, 0,
