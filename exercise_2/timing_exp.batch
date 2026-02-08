@@ -10,13 +10,15 @@ module load 2025
 module load openmpi
 module load slurm
 
-> results.log
+mkdir -p ./4_2
+
+> ./4_2/results.log
 
 for config in "1 4" "2 2"; do
-	for size in 100 200 400; do
-		echo "===Config: $config, Size: ${size}x${size} ===" >> results.log
+	for size in 100 200 400 800; do
+		echo "===Config: $config, Size: ${size}x${size} ===" >> ./4_2/results.log
 		./GridDist $config $size $size
-		srun MPI_Fempois >> results.log
-		echo "" >> results.log
+		srun MPI_Fempois >> ./4_2/results.log
+		echo "" >> ./4_2/results.log
 	done
 done
