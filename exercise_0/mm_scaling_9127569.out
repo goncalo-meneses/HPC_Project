@@ -1,0 +1,92 @@
+=== Serial N=200 ===
+srun: Warning: can't run 1 processes on 2 nodes, setting nnodes to 1
+N=200, time=0.027471 seconds
+
+=== N=200, p=1 ===
+srun: Warning: can't run 1 processes on 2 nodes, setting nnodes to 1
+N=200, p=1, time=0.027225 seconds
+
+=== N=200, p=2 ===
+N=200, p=2, time=0.013947 seconds
+
+=== N=200, p=8 ===
+N=200, p=8, time=0.019855 seconds
+
+=== N=200, p=24 ===
+N=200, p=24, time=0.002050 seconds
+
+=== N=200, p=48 ===
+N=200, p=48, time=0.007020 seconds
+
+=== N=200, p=64 ===
+N=200, p=64, time=0.013209 seconds
+
+=== Serial N=400 ===
+srun: Warning: can't run 1 processes on 2 nodes, setting nnodes to 1
+N=400, time=0.274120 seconds
+
+=== N=400, p=1 ===
+srun: Warning: can't run 1 processes on 2 nodes, setting nnodes to 1
+N=400, p=1, time=0.263480 seconds
+
+=== N=400, p=2 ===
+N=400, p=2, time=0.132256 seconds
+
+=== N=400, p=8 ===
+N=400, p=8, time=0.050241 seconds
+
+=== N=400, p=24 ===
+N=400, p=24, time=0.013523 seconds
+
+=== N=400, p=48 ===
+N=400, p=48, time=0.016655 seconds
+
+=== N=400, p=64 ===
+N=400, p=64, time=0.007670 seconds
+
+=== Serial N=800 ===
+srun: Warning: can't run 1 processes on 2 nodes, setting nnodes to 1
+N=800, time=2.180941 seconds
+
+=== N=800, p=1 ===
+srun: Warning: can't run 1 processes on 2 nodes, setting nnodes to 1
+N=800, p=1, time=2.070354 seconds
+
+=== N=800, p=2 ===
+N=800, p=2, time=1.038030 seconds
+
+=== N=800, p=8 ===
+N=800, p=8, time=0.314671 seconds
+
+=== N=800, p=24 ===
+N=800, p=24, time=0.139952 seconds
+
+=== N=800, p=48 ===
+N=800, p=48, time=0.072257 seconds
+
+=== N=800, p=64 ===
+N=800, p=64, time=0.083656 seconds
+
+=== Serial N=1000 ===
+srun: Warning: can't run 1 processes on 2 nodes, setting nnodes to 1
+N=1000, time=3.959589 seconds
+
+=== N=1000, p=1 ===
+srun: Warning: can't run 1 processes on 2 nodes, setting nnodes to 1
+N=1000, p=1, time=3.816651 seconds
+
+=== N=1000, p=2 ===
+N=1000, p=2, time=1.899186 seconds
+
+=== N=1000, p=8 ===
+N=1000, p=8, time=0.651854 seconds
+
+=== N=1000, p=24 ===
+N=1000, p=24, time=0.272020 seconds
+
+=== N=1000, p=48 ===
+N=1000, p=48, time=0.173405 seconds
+
+=== N=1000, p=64 ===
+N=1000, p=64, time=0.095719 seconds
+
